@@ -1,44 +1,23 @@
-# ME → WE → CHOICE — Site V1
+# ME → WE → CHOICE — Site V2
 
-Landing page institucional inicial da marca **ME → WE → CHOICE**.
+Segunda versão da landing page institucional.
 
-## Conceito da marca
+## Evoluções da V2
+- Header com marca mais legível e navegação refinada
+- Novo território de posicionamento: **Planejamento com propósito**
+- Projetos tratados como objetivos de vida, não catálogo de produtos
+- Método ME → WE → CHOICE refinado
+- Princípio institucional: **Entender antes de recomendar**
+- Protótipo interativo do diagnóstico inicial “O que você quer realizar?”
+- CTA de construção removido da experiência principal
+- Responsividade desktop/mobile mantida
 
-- **ME — O projeto é seu.**
-- **WE — Construímos juntos.**
-- **CHOICE — A escolha é sua.**
-- Assinatura: **PRIMEIRO O PROJETO. DEPOIS, A SOLUÇÃO.**
-
-## Paleta
-
+## Identidade
 - Azul profundo: `#0B2740`
-- Azul estratégia: `#00B8F6`
+- Azul estratégico: `#00B8F6`
 - Verde: `#2C6E6A`
 - Terracota: `#B97852`
 - Off-white: `#F7F4EE`
 
-## Rodar localmente
-
-```bash
-npm install
-npm run dev
-```
-
-Abra `http://localhost:3000`.
-
-## Deploy na Vercel
-
-1. Crie o repositório `mewechoice` no GitHub da marca.
-2. Faça upload/commit deste projeto.
-3. Na Vercel da ME WE CHOICE, importe o repositório.
-4. Framework detectado: Next.js.
-5. Deploy.
-6. Use o domínio provisório `*.vercel.app` até conectar `mewechoice.com.br` e/ou `mewechoice.com`.
-
-## Próximas etapas sugeridas
-
-- Conectar CTA ao canal oficial (WhatsApp/formulário) quando definido.
-- Adicionar analytics.
-- Criar página institucional completa /sobre.
-- Adicionar área de conteúdo/projetos.
-- Configurar domínio oficial e e-mail institucional.
+## Deploy
+Projeto Next.js pronto para GitHub + Vercel. Não requer variáveis de ambiente nesta versão.
