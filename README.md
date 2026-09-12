@@ -1,8 +1,8 @@
-# ME → WE → CHOICE — Site V3.5
+# ME → WE → CHOICE — Site V3.6
 
 Versão pós-red-team e pós-aprovação do diagnóstico guiado da marca **ME → WE → CHOICE**.
 
-## Principais mudanças da V3.5
+## Principais mudanças da V3.6
 
 - Hero restaurado para a hierarquia visual preferida: **PROJETOS • PLANEJAMENTO • ESCOLHAS**, marca grande **ME → WE → CHOICE** e assinatura **PRIMEIRO O PROJETO. DEPOIS, A SOLUÇÃO.**
 - Categoria **Viagem** adicionada ao diagnóstico, com ramificações e faixas próprias.
@@ -14,13 +14,13 @@ Versão pós-red-team e pós-aprovação do diagnóstico guiado da marca **ME �
 - Resultado gratuito inclui: **O que isso indica**, **O que vale observar** e **O que ainda precisamos entender**.
 - Nenhuma recomendação automática de produto.
 - Captura posterior de Nome + E-mail + WhatsApp mantém consentimento de marketing separado.
-- Estado CRM-ready atualizado para `diagnostic_version = V3.5`.
+- Estado CRM-ready atualizado para `diagnostic_version = V3.6`.
 - Fast-track para lead quente inclui mini escolha de interesse e captura mínima de Nome + WhatsApp antes do redirect, com estado `FAST_TRACK_CAPTURADO_SEM_CONVERSA`.
 - Motor de Interpretação V1 mantém composição modular e inclui fallback explícito para cenário de descoberta quase total, evitando falsa personalização.
 
 ## Importante: pré-lançamento
 
-Esta build **não envia dados para servidor, CRM, e-mail ou WhatsApp**. Para testes, o último lead fica apenas no navegador (`localStorage`, chave `mwc_last_lead`). Isso evita prometer integrações que ainda não foram conectadas.
+Esta build **não envia dados para servidor, CRM ou e-mail**. O WhatsApp abre somente após a captura local e quando o número oficial estiver configurado. Sem número, mostra canal em preparação. Para testes, o último lead fica apenas no navegador (`localStorage`, chave `mwc_last_lead`). Isso evita prometer integrações que ainda não foram conectadas.
 
 Antes do lançamento comercial, conectar:
 
@@ -49,3 +49,15 @@ npm run build
 ## Deploy na Vercel
 
 Importe o repositório no projeto da ME WE CHOICE. Framework: Next.js. Root: `./`.
+
+## Ajustes finais V3.6
+
+Veja NOTES-V3.6.md. Hero com assinatura menor, painel compacto sem cortes e Fast-track com apenas Consórcio, Aquisição planejada e Quero explicar meu objetivo.
+
+## Configurar WhatsApp
+
+Copie .env.example para .env.local e defina NEXT_PUBLIC_WHATSAPP_NUMBER com país e DDD (somente dígitos). Na Vercel, adicione a mesma variável e faça novo deploy. O número está vazio porque ainda não foi definido. Abrir o link não confirma envio de mensagem nem altera o estado para conversa iniciada.
+
+## Instalação reproduzível e validação
+
+Use npm ci, npm run typecheck e npm run build. Incluímos package-lock.json. Não envie node_modules, .next ou arquivos .env privados ao GitHub.

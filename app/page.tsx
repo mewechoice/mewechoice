@@ -255,7 +255,7 @@ function Quiz({ onClose }: { onClose: () => void }) {
     e.preventDefault();
     if (!lead.name.trim() || !lead.email.trim() || !lead.phone.trim()) return;
     const record = {
-      diagnostic_version: "V3.5",
+      diagnostic_version: "V3.6",
       source: "site",
       status: "NEXT_STEP_NOT_SELECTED",
       answers,
@@ -399,6 +399,9 @@ function Quiz({ onClose }: { onClose: () => void }) {
   );
 }
 
+const whatsappNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "").replace(/\D/g, "");
+const whatsappUrl = /^\d{10,15}$/.test(whatsappNumber) ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Olá! Gostaria de conversar sobre meu objetivo na ME WE CHOICE.")}` : null;
+
 export default function Home() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [fastTrack, setFastTrack] = useState(false);
@@ -406,6 +409,7 @@ export default function Home() {
   const [fastName, setFastName] = useState("");
   const [fastPhone, setFastPhone] = useState("");
   const [fastCaptured, setFastCaptured] = useState(false);
+  const [fastError, setFastError] = useState("");
 
   function closeFastTrack() {
     setFastTrack(false);
@@ -413,6 +417,7 @@ export default function Home() {
     setFastName("");
     setFastPhone("");
     setFastCaptured(false);
+    setFastError("");
   }
 
   function saveFastTrackLead(e: FormEvent) {
@@ -420,15 +425,18 @@ export default function Home() {
     if (!fastInterest || !fastName.trim() || !fastPhone.trim()) return;
     const record = {
       source: "FAST_TRACK",
-      diagnostic_version: "V3.5",
+      diagnostic_version: "V3.6",
       interest: fastInterest,
       name: fastName.trim(),
       phone: fastPhone.trim(),
       status: "FAST_TRACK_CAPTURADO_SEM_CONVERSA",
       created_at: new Date().toISOString(),
     };
-    try { localStorage.setItem("mwc_fast_track", JSON.stringify(record)); } catch {}
+    try { localStorage.setItem("mwc_fast_track", JSON.stringify(record)); }
+    catch { setFastError("Não foi possível salvar seus dados neste navegador. Habilite o armazenamento e tente novamente."); return; }
+    setFastError("");
     setFastCaptured(true);
+    if (whatsappUrl) window.location.assign(whatsappUrl);
   }
 
   return (
@@ -440,14 +448,14 @@ export default function Home() {
           <a href="#processo">Como funciona</a>
           <a href="#transparencia">Transparência</a>
         </nav>
-        <button className="header-consult" type="button" onClick={() => setFastTrack(true)}>Falar com um consultor →</button>
+        <button className="header-consult" type="button" onClick={() => setFastTrack(true)}>Fale com um consultor →</button>
       </header>
 
       <section id="top" className="hero shell">
         <div className="hero-copy">
           <p className="eyebrow">PROJETOS • PLANEJAMENTO • ESCOLHAS</p>
           <div className="hero-brand"><BrandMark /></div>
-          <h1>PRIMEIRO O PROJETO.<br />DEPOIS, A SOLUÇÃO.</h1>
+          <h1>Primeiro o projeto.<br />Depois, a solução.</h1>
           <p className="hero-lead">Organizamos objetivos, possibilidades e caminhos para decisões de aquisição, patrimônio e projetos pessoais.</p>
           <div className="hero-actions">
             <button className="btn" type="button" onClick={() => setQuizOpen(true)}>O que você quer realizar? →</button>
@@ -502,7 +510,7 @@ export default function Home() {
             <h2>Diferentes objetivos podem ter diferentes caminhos.</h2>
           </div>
           <div className="transparency-copy">
-            <p>Dependendo do objetivo e do momento, podem existir alternativas de aquisição planejada, consórcio, crédito ou outras soluções disponíveis por meio de parceiros.</p>
+            <p>Dependendo do objetivo e do momento, podem existir alternativas de aquisição planejada e consórcio, conforme as opções disponíveis em nossa atuação.</p>
             <p>Nosso papel é organizar possibilidades e avaliar, entre os caminhos disponíveis em nossa atuação, quais merecem ser considerados.</p>
             <div className="transparency-callout">Sempre deixamos claro quem oferece a solução e qual é nossa relação comercial com esse parceiro.</div>
           </div>
@@ -540,10 +548,10 @@ export default function Home() {
         <nav><a href="https://instagram.com/mewechoice" target="_blank" rel="noreferrer">Instagram</a><button type="button" onClick={() => setFastTrack(true)}>Contato</button><a href="#privacidade">Privacidade</a></nav>
         <p className="footer-right">Planejamento para escolhas que fazem sentido.<br />© 2026 ME WE CHOICE</p>
       </footer>
-      <div id="privacidade" className="privacy-strip"><div className="shell"><strong>Privacidade:</strong> esta V3.5 é um protótipo de pré-lançamento. O diagnóstico salva dados apenas no navegador para teste; CRM, e-mail e canais oficiais serão conectados antes do lançamento comercial.</div></div>
+      <div id="privacidade" className="privacy-strip"><div className="shell"><strong>Privacidade:</strong> esta V3.6 é um protótipo de pré-lançamento. O diagnóstico salva dados apenas no navegador para teste; CRM, e-mail e canais oficiais serão conectados antes do lançamento comercial.</div></div>
 
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} />}
-      {fastTrack && <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Atendimento direto ME WE CHOICE"><div className="fast-modal"><button className="modal-close" type="button" onClick={closeFastTrack}>×</button><p className="eyebrow">ATENDIMENTO DIRETO</p>{!fastInterest ? <><h2>Já sabe o que procura?</h2><p>Escolha a opção mais próxima. Esta rota é para quem já quer ir direto à conversa.</p><div className="fast-options">{["Consórcio", "Crédito", "Aquisição planejada", "Quero explicar meu objetivo", "Outro"].map((item) => <button type="button" key={item} onClick={() => setFastInterest(item)}>{item}<span>→</span></button>)}</div><button className="text-link fast-diagnostic" type="button" onClick={() => { closeFastTrack(); setQuizOpen(true); }}>Prefiro organizar meu ponto de partida primeiro →</button></> : !fastCaptured ? <><button className="quiz-back fast-back" type="button" onClick={() => setFastInterest(null)}>← Voltar</button><h2>Antes de continuar</h2><p>Informe seus dados para identificarmos seu atendimento e mantermos a continuidade da conversa.</p><div className="fast-interest-summary"><span>Interesse</span><strong>{fastInterest}</strong></div><form className="lead-form" onSubmit={saveFastTrackLead}><label>Nome<input required value={fastName} onChange={(e) => setFastName(e.target.value)} placeholder="Seu nome" /></label><label>WhatsApp<input required value={fastPhone} onChange={(e) => setFastPhone(e.target.value)} placeholder="(00) 00000-0000" /></label><p className="privacy-copy">Nesta versão de pré-lançamento, os dados ficam apenas neste navegador. Antes do lançamento, o Fast-Track será conectado ao CRM e ao WhatsApp oficial.</p><button className="btn" type="submit">Continuar pelo WhatsApp →</button></form></> : <><h2>Atendimento identificado.</h2><p>Seu interesse e seus dados foram registrados para evitar perda de contexto caso a transição para o WhatsApp seja interrompida.</p><div className="stage-message"><strong>FAST_TRACK_CAPTURADO_SEM_CONVERSA</strong><p>Quando o canal oficial estiver conectado, esta etapa abrirá o WhatsApp e atualizará o status para <code>CONTATO_IMEDIATO</code> após a conversa ser iniciada.</p></div><button className="btn" type="button" onClick={closeFastTrack}>Concluir →</button></>}</div></div>}
+      {fastTrack && <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Atendimento direto ME WE CHOICE"><div className="fast-modal"><button className="modal-close" type="button" onClick={closeFastTrack}>×</button><p className="eyebrow">ATENDIMENTO DIRETO</p>{!fastInterest ? <><h2>Já sabe o que procura?</h2><p>Escolha a opção mais próxima. Esta rota é para quem já quer ir direto à conversa.</p><div className="fast-options">{["Consórcio", "Aquisição planejada", "Quero explicar meu objetivo"].map((item) => <button type="button" key={item} onClick={() => setFastInterest(item)}>{item}<span>→</span></button>)}</div><button className="text-link fast-diagnostic" type="button" onClick={() => { closeFastTrack(); setQuizOpen(true); }}>Prefiro organizar meu ponto de partida primeiro →</button></> : !fastCaptured ? <><button className="quiz-back fast-back" type="button" onClick={() => setFastInterest(null)}>← Voltar</button><h2>Antes de continuar</h2><p>Informe seus dados para identificarmos seu atendimento e mantermos a continuidade da conversa.</p><div className="fast-interest-summary"><span>Interesse</span><strong>{fastInterest}</strong></div><form className="lead-form" onSubmit={saveFastTrackLead}><label>Nome<input required value={fastName} onChange={(e) => setFastName(e.target.value)} placeholder="Seu nome" /></label><label>WhatsApp<input required type="tel" inputMode="tel" pattern="[+0-9() .-]{10,20}" minLength={10} maxLength={20} value={fastPhone} onChange={(e) => setFastPhone(e.target.value)} placeholder="(00) 00000-0000" /></label><p className="privacy-copy">Nesta versão de pré-lançamento, os dados ficam apenas neste navegador. Antes do lançamento, o Fast-Track será conectado ao CRM e ao WhatsApp oficial.</p><p role="alert">{fastError}</p><button className="btn" type="submit">Continuar pelo WhatsApp →</button></form></> : <><h2>Atendimento identificado.</h2><p>Seu interesse e seus dados foram registrados para evitar perda de contexto caso a transição para o WhatsApp seja interrompida.</p><div className="stage-message"><strong>{whatsappUrl ? "Continue sua conversa" : "Canal em preparação"}</strong><p>{whatsappUrl ? "Se o WhatsApp não abriu, use o link abaixo." : "O WhatsApp oficial ainda não está disponível. Seus dados foram salvos apenas neste navegador; nenhum atendimento foi enviado."}</p>{whatsappUrl && <a className="btn" href={whatsappUrl}>Abrir WhatsApp →</a>}</div><button className="btn" type="button" onClick={closeFastTrack}>Concluir →</button></>}</div></div>}
     </main>
   );
 }
