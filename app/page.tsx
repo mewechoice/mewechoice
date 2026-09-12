@@ -2,7 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 
-type GoalKey = "patrimonio" | "imovel" | "veiculo" | "educacao" | "negocio" | "outros" | "descobrindo";
+type GoalKey = "patrimonio" | "imovel" | "veiculo" | "viagem" | "educacao" | "negocio" | "outros" | "descobrindo";
 
 type Answers = {
   goal?: GoalKey;
@@ -24,7 +24,8 @@ const goalOptions: { key: GoalKey; title: string; copy: string; accent: string }
   { key: "patrimonio", title: "Patrimônio", copy: "Construir ou ampliar patrimônio com organização.", accent: "blue" },
   { key: "imovel", title: "Imóvel", copy: "Comprar, trocar, construir ou reformar.", accent: "teal" },
   { key: "veiculo", title: "Veículo", copy: "Primeiro veículo, troca ou próxima aquisição.", accent: "terra" },
-  { key: "educacao", title: "Educação", copy: "Formação, especialização ou novos ciclos.", accent: "blue" },
+  { key: "viagem", title: "Viagem", copy: "Planejar uma viagem, experiência ou destino especial.", accent: "blue" },
+  { key: "educacao", title: "Educação", copy: "Formação, especialização ou novos ciclos.", accent: "teal" },
   { key: "negocio", title: "Negócio", copy: "Estrutura, expansão, equipamentos ou capitalização.", accent: "teal" },
   { key: "outros", title: "Outros objetivos", copy: "Um projeto que não cabe nas categorias acima.", accent: "terra" },
   { key: "descobrindo", title: "Ainda estou descobrindo", copy: "Você não precisa ter tudo definido para começar.", accent: "muted" },
@@ -34,7 +35,8 @@ const subgoals: Partial<Record<GoalKey, string[]>> = {
   patrimonio: ["Construir patrimônio", "Ampliar patrimônio", "Organizar uma aquisição futura"],
   imovel: ["Comprar meu primeiro imóvel", "Comprar ou trocar outro imóvel", "Construir", "Reformar"],
   veiculo: ["Comprar meu primeiro veículo", "Trocar de veículo", "Comprar outro veículo"],
-  educacao: ["Graduação ou formação", "Especialização", "Intercâmbio ou experiência educacional"],
+  viagem: ["Viagem de lazer", "Intercâmbio", "Evento ou experiência", "Ainda não defini"],
+  educacao: ["Graduação", "Pós ou especialização", "Curso", "Educação de familiar", "Outro objetivo educacional"],
   negocio: ["Abrir um negócio", "Expandir um negócio", "Equipamentos ou estrutura", "Outro objetivo empresarial"],
 };
 
@@ -44,23 +46,33 @@ const priorities = [
   "Planejar melhor os custos",
   "Ter previsibilidade",
   "Manter flexibilidade",
-  "Preservar minha organização financeira",
+  "Preservar meus recursos",
   "Comparar possibilidades",
   "Ainda não sei",
 ];
-const stages = ["Ainda não pesquisei", "Estou começando", "Já comparei alternativas", "Já recebi propostas", "Prefiro conversar antes de pesquisar mais"];
+const stages = [
+  "Estou começando a pensar",
+  "Já tenho uma ideia mais clara",
+  "Estou comparando possibilidades",
+  "Quero realizar em breve",
+  "Já sei o que quero",
+];
 
 function valueRanges(goal?: GoalKey) {
+  if (goal === "patrimonio") return ["Até R$ 100 mil", "R$ 100 mil a R$ 250 mil", "R$ 250 mil a R$ 500 mil", "Acima de R$ 500 mil", "Ainda não sei", "Prefiro não informar agora"];
   if (goal === "imovel") return ["Até R$ 250 mil", "R$ 250 mil a R$ 500 mil", "R$ 500 mil a R$ 1 milhão", "Acima de R$ 1 milhão", "Ainda não sei", "Prefiro não informar agora"];
   if (goal === "veiculo") return ["Até R$ 50 mil", "R$ 50 mil a R$ 100 mil", "R$ 100 mil a R$ 200 mil", "Acima de R$ 200 mil", "Ainda não sei", "Prefiro não informar agora"];
-  if (goal === "negocio") return ["Até R$ 100 mil", "R$ 100 mil a R$ 300 mil", "R$ 300 mil a R$ 1 milhão", "Acima de R$ 1 milhão", "Ainda não sei", "Prefiro não informar agora"];
-  return ["Até R$ 50 mil", "R$ 50 mil a R$ 150 mil", "R$ 150 mil a R$ 500 mil", "Acima de R$ 500 mil", "Ainda não sei", "Prefiro não informar agora"];
+  if (goal === "viagem") return ["Até R$ 10 mil", "R$ 10 mil a R$ 30 mil", "R$ 30 mil a R$ 60 mil", "Acima de R$ 60 mil", "Ainda não sei", "Prefiro não informar agora"];
+  if (goal === "educacao") return ["Até R$ 20 mil", "R$ 20 mil a R$ 50 mil", "R$ 50 mil a R$ 100 mil", "Acima de R$ 100 mil", "Ainda não sei", "Prefiro não informar agora"];
+  if (goal === "negocio") return ["Até R$ 50 mil", "R$ 50 mil a R$ 150 mil", "R$ 150 mil a R$ 500 mil", "Acima de R$ 500 mil", "Ainda não sei", "Prefiro não informar agora"];
+  return ["Ainda não sei", "Prefiro não informar agora"];
 }
 
 const goalLabels: Record<GoalKey, string> = {
   patrimonio: "Patrimônio",
   imovel: "Imóvel",
   veiculo: "Veículo",
+  viagem: "Viagem",
   educacao: "Educação",
   negocio: "Negócio",
   outros: "Outro objetivo",
@@ -129,7 +141,7 @@ function Quiz({ onClose }: { onClose: () => void }) {
   const mappedStep = useMemo(() => {
     const flow = ["goal"];
     if (hasSubgoal) flow.push("subgoal");
-    flow.push("timing", "priorities", "stage", "value", "result", "lead", "next");
+    flow.push("stage", "priorities", "timing", "value", "result", "lead", "next");
     return flow[step] || "goal";
   }, [step, hasSubgoal]);
 
@@ -153,27 +165,101 @@ function Quiz({ onClose }: { onClose: () => void }) {
     });
   }
 
-  function interpret() {
+  function interpretResult() {
     const p = answers.priorities;
-    const pieces: string[] = [];
-    if (answers.timing === "1 a 2 anos" || answers.timing === "Mais de 2 anos") pieces.push("Seu horizonte permite organizar a decisão com antecedência, sem transformar urgência em critério principal.");
-    if (answers.timing === "O quanto antes" || answers.timing === "Até 6 meses") pieces.push("Seu horizonte é curto, então prazo, disponibilidade e velocidade de execução terão peso maior na comparação dos caminhos.");
-    if (p.includes("Ter previsibilidade")) pieces.push("Como previsibilidade está entre suas prioridades, vale comparar caminhos considerando compromisso financeiro ao longo do tempo, não apenas o valor inicial.");
-    if (p.includes("Manter flexibilidade")) pieces.push("Flexibilidade aparece como critério relevante, então soluções muito rígidas merecem atenção adicional antes de qualquer decisão.");
-    if (p.includes("Planejar melhor os custos") || p.includes("Preservar minha organização financeira")) pieces.push("Organização de custos é central para você; a próxima etapa deve separar custo total, prazo e impacto no orçamento.");
-    if (p.includes("Comparar possibilidades")) pieces.push("Você indicou que comparar possibilidades é importante, então a próxima etapa deve tornar diferenças de prazo, custo, flexibilidade e condições explícitas.");
-    if (!pieces.length) pieces.push("Seu ponto de partida já permite organizar as próximas perguntas sem presumir uma solução. O próximo passo é entender melhor contexto, faixa e grau de flexibilidade desejado.");
-    return pieces.slice(0, 2);
+    const indications: string[] = [];
+    const observe: string[] = [];
+    const pending: string[] = [];
+
+    const discoveryFallback =
+      answers.goal === "descobrindo" &&
+      (!answers.timing || answers.timing === "Ainda não sei") &&
+      (answers.priorities.length === 0 || answers.priorities.includes("Ainda não sei")) &&
+      (!answers.value || answers.value === "Ainda não sei" || answers.value === "Prefiro não informar agora");
+
+    if (discoveryFallback) {
+      return {
+        indications: [
+          "Você ainda está construindo uma visão mais clara sobre o que pretende realizar. Neste momento, mais importante do que comparar soluções é organizar o próprio objetivo.",
+          "Ainda não existem informações suficientes para comparar caminhos de forma útil. Definir aos poucos o que você pretende realizar, em que horizonte e quais critérios mais importam já é parte do planejamento.",
+        ],
+        observe: ["objetivo", "momento", "prioridades", "capacidade de planejamento"],
+        pending: [
+          "o que você gostaria de realizar",
+          "quando isso faria sentido",
+          "quais limites ou prioridades precisam ser respeitados",
+        ],
+      };
+    }
+
+    const stageMap: Record<string, string> = {
+      "Estou começando a pensar": "Você está em uma fase de descoberta. Há espaço para amadurecer o objetivo antes de comparar soluções.",
+      "Já tenho uma ideia mais clara": "Seu objetivo já está mais definido. O próximo passo é transformar essa intenção em critérios objetivos de decisão.",
+      "Estou comparando possibilidades": "Você já entrou na fase de comparação. Agora importa comparar alternativas pelos mesmos critérios, e não por uma condição isolada.",
+      "Quero realizar em breve": "Seu objetivo está mais próximo. Prazo, disponibilidade e capacidade de execução ganham peso antes de qualquer decisão.",
+      "Já sei o que quero": "O objetivo está claro. A próxima etapa é avaliar como viabilizá-lo sem perder de vista custo, prazo e flexibilidade.",
+    };
+    if (answers.stage && stageMap[answers.stage]) indications.push(stageMap[answers.stage]);
+
+    if (answers.timing === "O quanto antes") indications.push("O tempo é um critério central neste cenário; caminhos que exigem espera ou maturação precisam ser avaliados com cuidado.");
+    else if (answers.timing === "Até 6 meses") indications.push("Existe algum espaço para planejamento, mas o prazo ainda é relativamente curto. Liquidez e velocidade de execução merecem atenção.");
+    else if (answers.timing === "6 a 12 meses") indications.push("Há tempo para comparar alternativas e organizar custos e condições antes da decisão.");
+    else if (answers.timing === "1 a 2 anos") indications.push("Seu horizonte permite um planejamento mais estruturado e comparação de diferentes caminhos antes de assumir compromissos.");
+    else if (answers.timing === "Mais de 2 anos") indications.push("O prazo mais longo amplia o espaço para organização e reduz a pressão por uma decisão imediata.");
+    else if (answers.timing === "Ainda não sei") indications.push("Antes de comparar soluções, vale amadurecer o prazo desejável e os critérios que fariam esse objetivo avançar.");
+
+    if (p.includes("Ter previsibilidade") && p.includes("Preservar meus recursos")) indications.push("Você busca avançar com clareza sobre o impacto ao longo do tempo, sem comprometer recursos além do necessário. Previsibilidade e desembolso inicial devem pesar bastante na comparação.");
+    else if (p.includes("Realizar mais rápido") && p.includes("Preservar meus recursos")) indications.push("Seu cenário pede equilíbrio entre velocidade de realização e preservação de recursos, dois critérios que podem apontar para caminhos diferentes.");
+    else if (p.includes("Planejar melhor os custos") && p.includes("Manter flexibilidade")) indications.push("Você quer controlar custos sem perder capacidade de adaptação. Custo total, prazo e regras de mudança merecem ser comparados em conjunto.");
+    else {
+      if (p.includes("Ter previsibilidade")) indications.push("Previsibilidade é uma prioridade; vale observar o impacto financeiro ao longo do tempo, e não apenas o valor inicial.");
+      if (p.includes("Manter flexibilidade")) indications.push("Flexibilidade aparece como critério relevante, então condições muito rígidas merecem atenção adicional.");
+      if (p.includes("Planejar melhor os custos")) indications.push("Organização de custos é central para você; custo total, prazo e impacto recorrente devem ser separados na comparação.");
+      if (p.includes("Preservar meus recursos")) indications.push("Preservar recursos é importante, então necessidade de entrada, liquidez e comprometimento imediato devem entrar na análise.");
+      if (p.includes("Comparar possibilidades")) indications.push("Como comparar alternativas é importante, a próxima etapa deve tornar diferenças de prazo, custo, flexibilidade e condições explícitas.");
+      if (p.includes("Realizar mais rápido")) indications.push("Velocidade de realização pesa na sua decisão, então prazo e disponibilidade precisam ser tratados como critérios centrais.");
+    }
+
+    const criteria: Partial<Record<GoalKey, string[]>> = {
+      patrimonio: ["horizonte", "liquidez", "capacidade financeira", "concentração patrimonial"],
+      imovel: ["entrada", "prazo", "custo total", "impacto mensal", "flexibilidade"],
+      veiculo: ["prazo", "entrada", "custo total", "depreciação", "necessidade imediata"],
+      viagem: ["prazo", "orçamento", "flexibilidade", "pagamentos antecipados", "câmbio quando aplicável"],
+      educacao: ["prazo de início", "duração", "custos totais", "capacidade de pagamento", "retorno pessoal ou profissional"],
+      negocio: ["capital necessário", "prazo", "liquidez", "geração de caixa", "risco operacional"],
+      outros: ["prazo", "custo", "flexibilidade", "prioridades"],
+      descobrindo: ["objetivo", "prazo", "prioridades", "capacidade financeira"],
+    };
+    observe.push(...(criteria[answers.goal || "outros"] || criteria.outros || []));
+
+    if (answers.goal === "imovel") pending.push("disponibilidade para entrada", "capacidade mensal confortável", "urgência real");
+    else if (answers.goal === "veiculo") pending.push("se existe veículo para troca", "uso pessoal ou profissional", "necessidade imediata");
+    else if (answers.goal === "viagem") pending.push("destino e datas", "flexibilidade de calendário", "custos em moeda estrangeira quando aplicável");
+    else if (answers.goal === "negocio") pending.push("capital próprio disponível", "prazo de implementação", "geração de caixa esperada");
+    else if (answers.goal === "educacao") pending.push("data de início", "duração", "forma de pagamento disponível");
+    else if (answers.goal === "patrimonio") pending.push("tipo de aquisição desejada", "horizonte patrimonial", "liquidez necessária");
+    else pending.push("prazo mais adequado", "faixa de valor", "grau de flexibilidade desejado");
+
+    if (!answers.value || answers.value === "Ainda não sei" || answers.value === "Prefiro não informar agora") {
+      pending.unshift("faixa aproximada do objetivo");
+    }
+
+    return {
+      indications: Array.from(new Set(indications)).slice(0, 3),
+      observe: Array.from(new Set(observe)).slice(0, 5),
+      pending: Array.from(new Set(pending)).slice(0, 4),
+    };
   }
 
   function handleLead(e: FormEvent) {
     e.preventDefault();
     if (!lead.name.trim() || !lead.email.trim() || !lead.phone.trim()) return;
     const record = {
-      diagnostic_version: "V3.3",
+      diagnostic_version: "V3.5",
       source: "site",
       status: "NEXT_STEP_NOT_SELECTED",
       answers,
+      interpretation: interpretResult(),
       lead,
       created_at: new Date().toISOString(),
     };
@@ -226,7 +312,7 @@ function Quiz({ onClose }: { onClose: () => void }) {
     </>;
 
     if (mappedStep === "timing") return <>
-      <p className="quiz-kicker">MOMENTO</p><h2>Quando você gostaria de realizar isso?</h2>
+      <p className="quiz-kicker">PRAZO</p><h2>Quando você gostaria de realizar isso?</h2>
       <div className="quiz-list">{timings.map((item) => optionButton(item, answers.timing === item, () => { setAnswers((a) => ({ ...a, timing: item })); setStep((s) => s + 1); }))}</div>
     </>;
 
@@ -237,7 +323,7 @@ function Quiz({ onClose }: { onClose: () => void }) {
     </>;
 
     if (mappedStep === "stage") return <>
-      <p className="quiz-kicker">ESTÁGIO</p><h2>Quanto você já pesquisou sobre os caminhos possíveis?</h2>
+      <p className="quiz-kicker">MOMENTO</p><h2>Em que momento você está?</h2><p className="quiz-intro">Isso nos ajuda a entender de onde estamos partindo.</p>
       <div className="quiz-list">{stages.map((item) => optionButton(item, answers.stage === item, () => { setAnswers((a) => ({ ...a, stage: item })); setStep((s) => s + 1); }))}</div>
     </>;
 
@@ -248,32 +334,33 @@ function Quiz({ onClose }: { onClose: () => void }) {
     </>;
 
     if (mappedStep === "result") {
-      const insights = interpret();
+      const result = interpretResult();
       return <>
         <p className="quiz-kicker">LEITURA INICIAL</p><h2>Seu ponto de partida está organizado.</h2>
         <div className="result-grid">
           <div><span>Objetivo</span><strong>{answers.subgoal || (answers.goal ? goalLabels[answers.goal] : "—")}</strong></div>
-          <div><span>Momento</span><strong>{answers.timing || "—"}</strong></div>
+          <div><span>Momento</span><strong>{answers.stage || "—"}</strong></div>
+          <div><span>Prazo</span><strong>{answers.timing || "—"}</strong></div>
           <div><span>Prioridades</span><strong>{answers.priorities.join(" + ") || "—"}</strong></div>
-          <div><span>Estágio</span><strong>{answers.stage || "—"}</strong></div>
           <div><span>Faixa</span><strong>{answers.value || "Não informada"}</strong></div>
         </div>
-        <div className="insight-card"><span>O QUE ISSO INDICA</span>{insights.map((x) => <p key={x}>{x}</p>)}</div>
-        <div className="insight-card insight-card--muted"><span>O QUE AINDA PRECISAMOS ENTENDER</span><p>Faixa de valor, disponibilidade financeira e grau de flexibilidade podem mudar bastante os caminhos possíveis. Esta leitura organiza o ponto de partida; ela não recomenda automaticamente nenhum produto.</p></div>
+        <div className="insight-card"><span>O QUE ISSO INDICA</span>{result.indications.map((x) => <p key={x}>{x}</p>)}</div>
+        <div className="insight-card insight-card--observe"><span>O QUE VALE OBSERVAR</span><p>{result.observe.join(" • ")}</p></div>
+        <div className="insight-card insight-card--muted"><span>O QUE AINDA PRECISAMOS ENTENDER</span><p>{result.pending.join(" • ")}</p></div>
         <p className="legal-note">Esta leitura é informativa e representa apenas uma organização inicial das informações fornecidas por você. Não constitui recomendação de investimento, concessão ou oferta de crédito, nem indicação automática de produto financeiro.</p>
-        <button className="btn quiz-next" type="button" onClick={() => setStep((s) => s + 1)}>Quero organizar os caminhos →</button>
+        <button className="btn quiz-next" type="button" onClick={() => setStep((s) => s + 1)}>VAMOS PLANEJAR JUNTOS →</button>
       </>;
     }
 
     if (mappedStep === "lead") return <>
-      <p className="quiz-kicker">CONTINUIDADE</p><h2>Salve seu atendimento e continue daqui.</h2>
-      <p className="quiz-intro">Esses dados permitem registrar seu ponto de partida e retomar seu objetivo sem que você precise começar novamente.</p>
+      <p className="quiz-kicker">CONTINUIDADE</p><h2>Salve seu resumo e continue de onde parou.</h2>
+      <p className="quiz-intro">Assim conseguimos enviar sua leitura inicial, registrar seu atendimento e retomar seu objetivo sem que você precise começar novamente.</p>
       <form className="lead-form" onSubmit={handleLead}>
         <label>Nome<input required value={lead.name} onChange={(e) => setLead((l) => ({ ...l, name: e.target.value }))} placeholder="Seu nome" /></label>
         <label>E-mail<input required type="email" value={lead.email} onChange={(e) => setLead((l) => ({ ...l, email: e.target.value }))} placeholder="voce@exemplo.com" /></label>
         <label>WhatsApp<input required value={lead.phone} onChange={(e) => setLead((l) => ({ ...l, phone: e.target.value }))} placeholder="(00) 00000-0000" /></label>
         <label className="check-row"><input type="checkbox" checked={lead.marketing} onChange={(e) => setLead((l) => ({ ...l, marketing: e.target.checked }))} /><span>Quero receber conteúdos e novidades da ME WE CHOICE.</span></label>
-        <p className="privacy-copy">Usaremos seus dados para registrar este atendimento e permitir a continuidade relacionada a este objetivo. A integração real com CRM e e-mail será conectada antes do lançamento comercial.</p>
+        <p className="privacy-copy">Usaremos seus dados para salvar e enviar seu resumo e dar continuidade ao atendimento relacionado a este objetivo. A integração real com CRM e e-mail será conectada antes do lançamento comercial.</p>
         <button className="btn" type="submit">Salvar e continuar →</button>
       </form>
     </>;
@@ -315,6 +402,34 @@ function Quiz({ onClose }: { onClose: () => void }) {
 export default function Home() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [fastTrack, setFastTrack] = useState(false);
+  const [fastInterest, setFastInterest] = useState<string | null>(null);
+  const [fastName, setFastName] = useState("");
+  const [fastPhone, setFastPhone] = useState("");
+  const [fastCaptured, setFastCaptured] = useState(false);
+
+  function closeFastTrack() {
+    setFastTrack(false);
+    setFastInterest(null);
+    setFastName("");
+    setFastPhone("");
+    setFastCaptured(false);
+  }
+
+  function saveFastTrackLead(e: FormEvent) {
+    e.preventDefault();
+    if (!fastInterest || !fastName.trim() || !fastPhone.trim()) return;
+    const record = {
+      source: "FAST_TRACK",
+      diagnostic_version: "V3.5",
+      interest: fastInterest,
+      name: fastName.trim(),
+      phone: fastPhone.trim(),
+      status: "FAST_TRACK_CAPTURADO_SEM_CONVERSA",
+      created_at: new Date().toISOString(),
+    };
+    try { localStorage.setItem("mwc_fast_track", JSON.stringify(record)); } catch {}
+    setFastCaptured(true);
+  }
 
   return (
     <main>
@@ -330,7 +445,8 @@ export default function Home() {
 
       <section id="top" className="hero shell">
         <div className="hero-copy">
-          <p className="eyebrow">ME → WE → CHOICE</p>
+          <p className="eyebrow">PROJETOS • PLANEJAMENTO • ESCOLHAS</p>
+          <div className="hero-brand"><BrandMark /></div>
           <h1>PRIMEIRO O PROJETO.<br />DEPOIS, A SOLUÇÃO.</h1>
           <p className="hero-lead">Organizamos objetivos, possibilidades e caminhos para decisões de aquisição, patrimônio e projetos pessoais.</p>
           <div className="hero-actions">
@@ -424,10 +540,10 @@ export default function Home() {
         <nav><a href="https://instagram.com/mewechoice" target="_blank" rel="noreferrer">Instagram</a><button type="button" onClick={() => setFastTrack(true)}>Contato</button><a href="#privacidade">Privacidade</a></nav>
         <p className="footer-right">Planejamento para escolhas que fazem sentido.<br />© 2026 ME WE CHOICE</p>
       </footer>
-      <div id="privacidade" className="privacy-strip"><div className="shell"><strong>Privacidade:</strong> esta V3.3 é um protótipo de pré-lançamento. O diagnóstico salva dados apenas no navegador para teste; CRM, e-mail e canais oficiais serão conectados antes do lançamento comercial.</div></div>
+      <div id="privacidade" className="privacy-strip"><div className="shell"><strong>Privacidade:</strong> esta V3.5 é um protótipo de pré-lançamento. O diagnóstico salva dados apenas no navegador para teste; CRM, e-mail e canais oficiais serão conectados antes do lançamento comercial.</div></div>
 
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} />}
-      {fastTrack && <div className="modal-overlay" role="dialog" aria-modal="true"><div className="fast-modal"><button className="modal-close" type="button" onClick={() => setFastTrack(false)}>×</button><p className="eyebrow">FAST-TRACK</p><h2>Já sabe o que procura?</h2><p>Podemos ir direto à conversa. O canal oficial de WhatsApp será conectado antes do lançamento comercial.</p><button className="btn" type="button" onClick={() => { setFastTrack(false); setQuizOpen(true); }}>Enquanto isso, organizar meu ponto de partida →</button></div></div>}
+      {fastTrack && <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Atendimento direto ME WE CHOICE"><div className="fast-modal"><button className="modal-close" type="button" onClick={closeFastTrack}>×</button><p className="eyebrow">ATENDIMENTO DIRETO</p>{!fastInterest ? <><h2>Já sabe o que procura?</h2><p>Escolha a opção mais próxima. Esta rota é para quem já quer ir direto à conversa.</p><div className="fast-options">{["Consórcio", "Crédito", "Aquisição planejada", "Quero explicar meu objetivo", "Outro"].map((item) => <button type="button" key={item} onClick={() => setFastInterest(item)}>{item}<span>→</span></button>)}</div><button className="text-link fast-diagnostic" type="button" onClick={() => { closeFastTrack(); setQuizOpen(true); }}>Prefiro organizar meu ponto de partida primeiro →</button></> : !fastCaptured ? <><button className="quiz-back fast-back" type="button" onClick={() => setFastInterest(null)}>← Voltar</button><h2>Antes de continuar</h2><p>Informe seus dados para identificarmos seu atendimento e mantermos a continuidade da conversa.</p><div className="fast-interest-summary"><span>Interesse</span><strong>{fastInterest}</strong></div><form className="lead-form" onSubmit={saveFastTrackLead}><label>Nome<input required value={fastName} onChange={(e) => setFastName(e.target.value)} placeholder="Seu nome" /></label><label>WhatsApp<input required value={fastPhone} onChange={(e) => setFastPhone(e.target.value)} placeholder="(00) 00000-0000" /></label><p className="privacy-copy">Nesta versão de pré-lançamento, os dados ficam apenas neste navegador. Antes do lançamento, o Fast-Track será conectado ao CRM e ao WhatsApp oficial.</p><button className="btn" type="submit">Continuar pelo WhatsApp →</button></form></> : <><h2>Atendimento identificado.</h2><p>Seu interesse e seus dados foram registrados para evitar perda de contexto caso a transição para o WhatsApp seja interrompida.</p><div className="stage-message"><strong>FAST_TRACK_CAPTURADO_SEM_CONVERSA</strong><p>Quando o canal oficial estiver conectado, esta etapa abrirá o WhatsApp e atualizará o status para <code>CONTATO_IMEDIATO</code> após a conversa ser iniciada.</p></div><button className="btn" type="button" onClick={closeFastTrack}>Concluir →</button></>}</div></div>}
     </main>
   );
 }

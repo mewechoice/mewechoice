@@ -1,24 +1,22 @@
-# ME → WE → CHOICE — Site V3.3
+# ME → WE → CHOICE — Site V3.5
 
-Candidata de implementação pós-red-team da marca **ME → WE → CHOICE**.
+Versão pós-red-team e pós-aprovação do diagnóstico guiado da marca **ME → WE → CHOICE**.
 
-## O que mudou na V3.3
+## Principais mudanças da V3.5
 
-- Hero refinado com a assinatura **PRIMEIRO O PROJETO. DEPOIS, A SOLUÇÃO.**
-- Duas rotas: diagnóstico guiado e fast-track para lead de alta intenção.
-- Método visual **ME → WE → CHOICE** com progressão horizontal no desktop e vertical no mobile.
-- Processo separado: **ENTENDER → ORGANIZAR → AVALIAR**.
-- Transparência comercial explícita sobre soluções e parceiros.
-- Seção de confiança sem prova social inventada.
-- Diagnóstico guiado mobile-first, com ramificações por objetivo.
-- Resultado gratuito antes da captura de contato.
-- Interpretação inicial sem recomendar produto automaticamente.
-- Captura posterior de Nome + E-mail + WhatsApp.
-- Preferência de próximo passo: WhatsApp, agendamento ou continuar depois.
-- Preferência temporal de follow-up e opção de não receber contato proativo.
-- Modelo de dados CRM-ready salvo apenas em `localStorage` nesta versão de pré-lançamento.
-- Estado preparado para `NEXT_STEP_NOT_SELECTED` caso o usuário abandone após salvar dados.
-- Disclaimer informativo no resultado.
+- Hero restaurado para a hierarquia visual preferida: **PROJETOS • PLANEJAMENTO • ESCOLHAS**, marca grande **ME → WE → CHOICE** e assinatura **PRIMEIRO O PROJETO. DEPOIS, A SOLUÇÃO.**
+- Categoria **Viagem** adicionada ao diagnóstico, com ramificações e faixas próprias.
+- CTA pós-resultado alterado para **VAMOS PLANEJAR JUNTOS →**, marcando a passagem de ME para WE.
+- Etapas do diagnóstico reorganizadas: categoria/subcategoria → momento de maturidade → prioridades → prazo → faixa opcional.
+- Prioridade atualizada para **Preservar meus recursos**.
+- Faixas de valor dinâmicas para Patrimônio, Imóvel, Veículo, Viagem, Educação e Negócio.
+- Motor de Interpretação V1 ampliado para cruzar maturidade, prazo, prioridades e categoria.
+- Resultado gratuito inclui: **O que isso indica**, **O que vale observar** e **O que ainda precisamos entender**.
+- Nenhuma recomendação automática de produto.
+- Captura posterior de Nome + E-mail + WhatsApp mantém consentimento de marketing separado.
+- Estado CRM-ready atualizado para `diagnostic_version = V3.5`.
+- Fast-track para lead quente inclui mini escolha de interesse e captura mínima de Nome + WhatsApp antes do redirect, com estado `FAST_TRACK_CAPTURADO_SEM_CONVERSA`.
+- Motor de Interpretação V1 mantém composição modular e inclui fallback explícito para cenário de descoberta quase total, evitando falsa personalização.
 
 ## Importante: pré-lançamento
 
