@@ -213,7 +213,6 @@ Você define apenas como explicar isso de maneira humana.
 
 const INTERPRETATION_RESPONSE_SCHEMA = {
   type: "object",
-  additionalProperties: false,
   properties: {
     reading: {
       type: "string",
