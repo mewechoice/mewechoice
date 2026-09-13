@@ -199,35 +199,20 @@ a { color: inherit; text-decoration: none; }
 .fast-interest-summary strong { font-size: 18px; color: var(--navy); }
 .fast-back { margin: 0 0 10px; }
 .stage-message code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
-
-/* V3.6: marca dominante, assinatura menor e painel integral. */
-main { background: var(--off); }
-.site-header { background: var(--navy-2); box-shadow: 0 0 0 100vmax var(--navy-2); clip-path: inset(0 -100vmax); }
-.hero { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 48px; min-height: 600px; padding: 64px 0 72px; background: var(--navy); box-shadow: 0 0 0 100vmax var(--navy); clip-path: inset(0 -100vmax); }
-.hero::before { display: none; }
-.hero-copy { min-width: 0; }
-.hero .eyebrow { color: var(--blue); }
-.hero-brand .brand-mark { font-size: clamp(32px, 4.7vw, 62px); white-space: nowrap; }
-.hero h1 { font-size: clamp(30px, 3vw, 40px); line-height: 1.12; letter-spacing: -.015em; margin: 24px 0 20px; }
-.hero-lead { max-width: 580px; font-size: 15px; }
-.hero-panel { min-width: 0; min-height: 370px; padding: 26px; border-radius: 24px; overflow: visible; }
-.vertical-journey { width: 100%; min-width: 0; }
-.mini-card { min-width: 0; min-height: 76px; padding: 16px; gap: 12px; border-radius: 14px; }
-.mini-card span { flex-shrink: 0; font-size: 24px; }
-.mini-card strong { font-size: 11px; line-height: 1.5; }
-.mini-arrow { height: 34px; font-size: 22px; }
-.fast-modal { max-height: calc(100dvh - 36px); overflow-y: auto; }
-@media (max-width: 900px) {
-  .hero { grid-template-columns: 1fr; gap: 36px; }
-  .hero-brand .brand-mark { font-size: clamp(27px, 8.5vw, 62px); }
-  .hero-panel { width: min(100%, 420px); justify-self: center; }
-}
+/* V3.7 visual refinement + Engine V2.4 */
+.hero h1 { font-size: clamp(40px, 4.8vw, 66px); line-height: .98; }
+.hero-brand .brand-mark { font-size: clamp(44px, 5.8vw, 76px); }
+.hero-panel { min-height: 470px; padding: 34px; }
+.vertical-journey { width: min(100%, 430px); }
+.mini-card { min-height: 88px; padding: 18px 22px; gap: 18px; }
+.mini-card span { font-size: 27px; }
+.mini-card strong { max-width: 170px; font-size: 12px; }
+.engine-note { margin: 12px 0 0; color: var(--muted); font-size: 9px; line-height: 1.55; }
 @media (max-width: 620px) {
-  .hero { padding: 40px 0 52px; }
-  .hero h1 { font-size: 30px; }
-  .hero-panel { min-height: 330px; padding: 20px; }
-  .hero-actions { gap: 20px; }
-  .hero-fast { line-height: 1.8; text-align: left; }
-  .modal-overlay { padding: 0; }
-  .fast-modal { min-height: 0; max-height: 100dvh; }
+  .hero h1 { font-size: 40px; }
+  .hero-brand .brand-mark { font-size: 41px; }
+  .hero-panel { min-height: 390px; padding: 20px; }
+  .mini-card { min-height: 82px; padding: 15px 16px; }
+  .mini-card span { font-size: 23px; }
+  .mini-card strong { max-width: 145px; font-size: 11px; }
 }

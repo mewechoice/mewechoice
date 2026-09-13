@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type GoalKey = "patrimonio" | "imovel" | "veiculo" | "viagem" | "educacao" | "negocio" | "outros" | "descobrindo";
 
@@ -19,6 +19,80 @@ type Lead = {
   phone: string;
   marketing: boolean;
 };
+
+type EngineReading = {
+  reading: string;
+  clear_points: string[];
+  attention_points: string[];
+  missing_information: string[];
+  next_step: string;
+};
+
+const engineSubgoal: Record<string, string> = {
+  "Construir patrimônio": "construir_patrimonio",
+  "Ampliar patrimônio": "ampliar_patrimonio",
+  "Organizar uma aquisição futura": "aquisicao_futura",
+  "Comprar meu primeiro imóvel": "primeiro_imovel",
+  "Comprar ou trocar outro imóvel": "trocar_imovel",
+  "Construir": "construir",
+  "Reformar": "reformar",
+  "Comprar meu primeiro veículo": "primeiro_veiculo",
+  "Trocar de veículo": "trocar_veiculo",
+  "Comprar outro veículo": "outro_veiculo",
+  "Viagem de lazer": "lazer",
+  "Intercâmbio": "intercambio",
+  "Evento ou experiência": "evento_experiencia",
+  "Ainda não defini": "nao_definida",
+  "Graduação": "graduacao",
+  "Pós ou especialização": "pos_especializacao",
+  "Curso": "curso",
+  "Educação de familiar": "educacao_familiar",
+  "Outro objetivo educacional": "outro_educacional",
+  "Abrir um negócio": "abrir",
+  "Expandir um negócio": "expandir",
+  "Equipamentos ou estrutura": "equipamentos_estrutura",
+  "Outro objetivo empresarial": "outro_empresarial",
+};
+
+const engineMaturity: Record<string, string> = {
+  "Estou começando a pensar": "comecando",
+  "Já tenho uma ideia mais clara": "ideia_clara",
+  "Estou comparando possibilidades": "comparando",
+  "Quero realizar em breve": "realizar_breve",
+  "Já sei o que quero": "ja_sei",
+};
+const enginePriority: Record<string, string> = {
+  "Realizar mais rápido": "rapidez",
+  "Planejar melhor os custos": "custos",
+  "Ter previsibilidade": "previsibilidade",
+  "Manter flexibilidade": "flexibilidade",
+  "Preservar meus recursos": "preservar_recursos",
+  "Comparar possibilidades": "comparar",
+  "Ainda não sei": "nao_sei",
+};
+const engineTimeline: Record<string, string> = {
+  "O quanto antes": "agora",
+  "Até 6 meses": "ate_6_meses",
+  "6 a 12 meses": "6_12_meses",
+  "1 a 2 anos": "1_2_anos",
+  "Mais de 2 anos": "mais_2_anos",
+  "Ainda não sei": "nao_sei",
+};
+function mapEngineValue(goal: GoalKey, value?: string): string {
+  if (!value || value === "Ainda não sei") return "nao_sei";
+  if (value === "Prefiro não informar agora") return "prefiro_nao_informar";
+  const maps: Record<GoalKey, Record<string, string>> = {
+    patrimonio: { "Até R$ 100 mil": "patrimonio_ate_100k", "R$ 100 mil a R$ 250 mil": "patrimonio_100_250k", "R$ 250 mil a R$ 500 mil": "patrimonio_250_500k", "Acima de R$ 500 mil": "patrimonio_acima_500k" },
+    imovel: { "Até R$ 250 mil": "imovel_ate_250k", "R$ 250 mil a R$ 500 mil": "imovel_250_500k", "R$ 500 mil a R$ 1 milhão": "imovel_500k_1m", "Acima de R$ 1 milhão": "imovel_acima_1m" },
+    veiculo: { "Até R$ 50 mil": "veiculo_ate_50k", "R$ 50 mil a R$ 100 mil": "veiculo_50_100k", "R$ 100 mil a R$ 200 mil": "veiculo_100_200k", "Acima de R$ 200 mil": "veiculo_acima_200k" },
+    viagem: { "Até R$ 10 mil": "viagem_ate_10k", "R$ 10 mil a R$ 30 mil": "viagem_10_30k", "R$ 30 mil a R$ 60 mil": "viagem_30_60k", "Acima de R$ 60 mil": "viagem_acima_60k" },
+    educacao: { "Até R$ 20 mil": "educacao_ate_20k", "R$ 20 mil a R$ 50 mil": "educacao_20_50k", "R$ 50 mil a R$ 100 mil": "educacao_50_100k", "Acima de R$ 100 mil": "educacao_acima_100k" },
+    negocio: { "Até R$ 50 mil": "negocio_ate_50k", "R$ 50 mil a R$ 150 mil": "negocio_50_150k", "R$ 150 mil a R$ 500 mil": "negocio_150_500k", "Acima de R$ 500 mil": "negocio_acima_500k" },
+    outros: {},
+    descobrindo: {},
+  };
+  return maps[goal][value] || "nao_sei";
+}
 
 const goalOptions: { key: GoalKey; title: string; copy: string; accent: string }[] = [
   { key: "patrimonio", title: "Patrimônio", copy: "Construir ou ampliar patrimônio com organização.", accent: "blue" },
@@ -134,6 +208,9 @@ function Quiz({ onClose }: { onClose: () => void }) {
   const [saved, setSaved] = useState(false);
   const [nextChoice, setNextChoice] = useState<string | null>(null);
   const [followUp, setFollowUp] = useState<string | null>(null);
+  const [engineReading, setEngineReading] = useState<EngineReading | null>(null);
+  const [engineSource, setEngineSource] = useState<string>("local-v1");
+  const [engineLoading, setEngineLoading] = useState(false);
 
   const hasSubgoal = !!(answers.goal && subgoals[answers.goal]);
   const totalCoreSteps = hasSubgoal ? 6 : 5;
@@ -163,6 +240,23 @@ function Quiz({ onClose }: { onClose: () => void }) {
       if (current.priorities.length >= 2) return current;
       return { ...current, priorities: [...current.priorities, priority] };
     });
+  }
+
+  function toEnginePayload() {
+    if (!answers.goal || !answers.stage || !answers.timing || answers.priorities.length === 0) return null;
+    const subcategory = answers.goal === "outros" ? "contato_humano" : answers.goal === "descobrindo" ? "nao_definida" : engineSubgoal[answers.subgoal || ""];
+    if (!subcategory) return null;
+    const valueRange = mapEngineValue(answers.goal, answers.value);
+    return {
+      engine_version: "2.4",
+      schema_version: "1.0",
+      category: answers.goal,
+      subcategory,
+      maturity: engineMaturity[answers.stage],
+      priorities: answers.priorities.map((p) => enginePriority[p]),
+      timeline: engineTimeline[answers.timing],
+      value_range: valueRange,
+    };
   }
 
   function interpretResult() {
@@ -251,15 +345,40 @@ function Quiz({ onClose }: { onClose: () => void }) {
     };
   }
 
+  useEffect(() => {
+    if (mappedStep !== "result") return;
+    const payload = toEnginePayload();
+    if (!payload || answers.goal === "outros") { setEngineReading(null); setEngineSource("local-v1"); return; }
+    let cancelled = false;
+    const session = (() => {
+      try {
+        const existing = sessionStorage.getItem("mwc_session_uuid");
+        if (existing) return existing;
+        const id = crypto.randomUUID();
+        sessionStorage.setItem("mwc_session_uuid", id);
+        return id;
+      } catch { return "anonymous-session"; }
+    })();
+    setEngineLoading(true);
+    fetch("/api/interpret", { method: "POST", headers: { "content-type": "application/json", "x-mwc-session": session }, body: JSON.stringify(payload) })
+      .then(async (res) => { if (!res.ok) throw new Error("ENGINE_HTTP"); return res.json(); })
+      .then((data) => { if (!cancelled && data?.result) { setEngineReading(data.result); setEngineSource(data?.meta?.source || "engine"); } })
+      .catch(() => { if (!cancelled) { setEngineReading(null); setEngineSource("local-v1"); } })
+      .finally(() => { if (!cancelled) setEngineLoading(false); });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mappedStep, answers.goal, answers.subgoal, answers.stage, answers.timing, answers.value, answers.priorities.join("|")]);
+
   function handleLead(e: FormEvent) {
     e.preventDefault();
     if (!lead.name.trim() || !lead.email.trim() || !lead.phone.trim()) return;
     const record = {
-      diagnostic_version: "V3.6",
+      diagnostic_version: "V3.7",
       source: "site",
       status: "NEXT_STEP_NOT_SELECTED",
       answers,
-      interpretation: interpretResult(),
+      interpretation: engineReading || interpretResult(),
+      interpretation_source: engineSource,
       lead,
       created_at: new Date().toISOString(),
     };
@@ -344,9 +463,12 @@ function Quiz({ onClose }: { onClose: () => void }) {
           <div><span>Prioridades</span><strong>{answers.priorities.join(" + ") || "—"}</strong></div>
           <div><span>Faixa</span><strong>{answers.value || "Não informada"}</strong></div>
         </div>
-        <div className="insight-card"><span>O QUE ISSO INDICA</span>{result.indications.map((x) => <p key={x}>{x}</p>)}</div>
-        <div className="insight-card insight-card--observe"><span>O QUE VALE OBSERVAR</span><p>{result.observe.join(" • ")}</p></div>
-        <div className="insight-card insight-card--muted"><span>O QUE AINDA PRECISAMOS ENTENDER</span><p>{result.pending.join(" • ")}</p></div>
+        {engineLoading ? <div className="insight-card"><span>ORGANIZANDO SUA LEITURA</span><p>Estamos organizando as informações que você selecionou. Se a camada de IA não responder a tempo, o resultado seguro é exibido automaticamente.</p></div> : <>
+          <div className="insight-card"><span>O QUE ISSO INDICA</span>{engineReading ? <p>{engineReading.reading}</p> : result.indications.map((x) => <p key={x}>{x}</p>)}</div>
+          <div className="insight-card insight-card--observe"><span>O QUE VALE OBSERVAR</span>{engineReading ? engineReading.attention_points.map((x) => <p key={x}>{x}</p>) : <p>{result.observe.join(" • ")}</p>}</div>
+          <div className="insight-card insight-card--muted"><span>O QUE AINDA PRECISAMOS ENTENDER</span>{engineReading ? engineReading.missing_information.map((x) => <p key={x}>{x}</p>) : <p>{result.pending.join(" • ")}</p>}</div>
+        </>}
+        <p className="engine-note">Motor de interpretação: {engineSource === "gemini" ? "leitura linguística personalizada" : "fallback determinístico seguro"}. A IA não recebe seu nome, e-mail ou WhatsApp.</p>
         <p className="legal-note">Esta leitura é informativa e representa apenas uma organização inicial das informações fornecidas por você. Não constitui recomendação de investimento, concessão ou oferta de crédito, nem indicação automática de produto financeiro.</p>
         <button className="btn quiz-next" type="button" onClick={() => setStep((s) => s + 1)}>VAMOS PLANEJAR JUNTOS →</button>
       </>;
@@ -399,9 +521,6 @@ function Quiz({ onClose }: { onClose: () => void }) {
   );
 }
 
-const whatsappNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "").replace(/\D/g, "");
-const whatsappUrl = /^\d{10,15}$/.test(whatsappNumber) ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Olá! Gostaria de conversar sobre meu objetivo na ME WE CHOICE.")}` : null;
-
 export default function Home() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [fastTrack, setFastTrack] = useState(false);
@@ -409,7 +528,6 @@ export default function Home() {
   const [fastName, setFastName] = useState("");
   const [fastPhone, setFastPhone] = useState("");
   const [fastCaptured, setFastCaptured] = useState(false);
-  const [fastError, setFastError] = useState("");
 
   function closeFastTrack() {
     setFastTrack(false);
@@ -417,7 +535,6 @@ export default function Home() {
     setFastName("");
     setFastPhone("");
     setFastCaptured(false);
-    setFastError("");
   }
 
   function saveFastTrackLead(e: FormEvent) {
@@ -425,18 +542,15 @@ export default function Home() {
     if (!fastInterest || !fastName.trim() || !fastPhone.trim()) return;
     const record = {
       source: "FAST_TRACK",
-      diagnostic_version: "V3.6",
+      diagnostic_version: "V3.7",
       interest: fastInterest,
       name: fastName.trim(),
       phone: fastPhone.trim(),
       status: "FAST_TRACK_CAPTURADO_SEM_CONVERSA",
       created_at: new Date().toISOString(),
     };
-    try { localStorage.setItem("mwc_fast_track", JSON.stringify(record)); }
-    catch { setFastError("Não foi possível salvar seus dados neste navegador. Habilite o armazenamento e tente novamente."); return; }
-    setFastError("");
+    try { localStorage.setItem("mwc_fast_track", JSON.stringify(record)); } catch {}
     setFastCaptured(true);
-    if (whatsappUrl) window.location.assign(whatsappUrl);
   }
 
   return (
@@ -448,14 +562,14 @@ export default function Home() {
           <a href="#processo">Como funciona</a>
           <a href="#transparencia">Transparência</a>
         </nav>
-        <button className="header-consult" type="button" onClick={() => setFastTrack(true)}>Fale com um consultor →</button>
+        <button className="header-consult" type="button" onClick={() => setFastTrack(true)}>Falar com um consultor →</button>
       </header>
 
       <section id="top" className="hero shell">
         <div className="hero-copy">
           <p className="eyebrow">PROJETOS • PLANEJAMENTO • ESCOLHAS</p>
           <div className="hero-brand"><BrandMark /></div>
-          <h1>Primeiro o projeto.<br />Depois, a solução.</h1>
+          <h1>PRIMEIRO O PROJETO.<br />DEPOIS, A SOLUÇÃO.</h1>
           <p className="hero-lead">Organizamos objetivos, possibilidades e caminhos para decisões de aquisição, patrimônio e projetos pessoais.</p>
           <div className="hero-actions">
             <button className="btn" type="button" onClick={() => setQuizOpen(true)}>O que você quer realizar? →</button>
@@ -510,7 +624,7 @@ export default function Home() {
             <h2>Diferentes objetivos podem ter diferentes caminhos.</h2>
           </div>
           <div className="transparency-copy">
-            <p>Dependendo do objetivo e do momento, podem existir alternativas de aquisição planejada e consórcio, conforme as opções disponíveis em nossa atuação.</p>
+            <p>Dependendo do objetivo e do momento, podem existir alternativas de aquisição planejada, consórcio ou outras soluções disponíveis por meio de parceiros.</p>
             <p>Nosso papel é organizar possibilidades e avaliar, entre os caminhos disponíveis em nossa atuação, quais merecem ser considerados.</p>
             <div className="transparency-callout">Sempre deixamos claro quem oferece a solução e qual é nossa relação comercial com esse parceiro.</div>
           </div>
@@ -548,10 +662,10 @@ export default function Home() {
         <nav><a href="https://instagram.com/mewechoice" target="_blank" rel="noreferrer">Instagram</a><button type="button" onClick={() => setFastTrack(true)}>Contato</button><a href="#privacidade">Privacidade</a></nav>
         <p className="footer-right">Planejamento para escolhas que fazem sentido.<br />© 2026 ME WE CHOICE</p>
       </footer>
-      <div id="privacidade" className="privacy-strip"><div className="shell"><strong>Privacidade:</strong> esta V3.6 é um protótipo de pré-lançamento. O diagnóstico salva dados apenas no navegador para teste; CRM, e-mail e canais oficiais serão conectados antes do lançamento comercial.</div></div>
+      <div id="privacidade" className="privacy-strip"><div className="shell"><strong>Privacidade:</strong> esta V3.5 é um protótipo de pré-lançamento. O diagnóstico salva dados apenas no navegador para teste; CRM, e-mail e canais oficiais serão conectados antes do lançamento comercial.</div></div>
 
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} />}
-      {fastTrack && <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Atendimento direto ME WE CHOICE"><div className="fast-modal"><button className="modal-close" type="button" onClick={closeFastTrack}>×</button><p className="eyebrow">ATENDIMENTO DIRETO</p>{!fastInterest ? <><h2>Já sabe o que procura?</h2><p>Escolha a opção mais próxima. Esta rota é para quem já quer ir direto à conversa.</p><div className="fast-options">{["Consórcio", "Aquisição planejada", "Quero explicar meu objetivo"].map((item) => <button type="button" key={item} onClick={() => setFastInterest(item)}>{item}<span>→</span></button>)}</div><button className="text-link fast-diagnostic" type="button" onClick={() => { closeFastTrack(); setQuizOpen(true); }}>Prefiro organizar meu ponto de partida primeiro →</button></> : !fastCaptured ? <><button className="quiz-back fast-back" type="button" onClick={() => setFastInterest(null)}>← Voltar</button><h2>Antes de continuar</h2><p>Informe seus dados para identificarmos seu atendimento e mantermos a continuidade da conversa.</p><div className="fast-interest-summary"><span>Interesse</span><strong>{fastInterest}</strong></div><form className="lead-form" onSubmit={saveFastTrackLead}><label>Nome<input required value={fastName} onChange={(e) => setFastName(e.target.value)} placeholder="Seu nome" /></label><label>WhatsApp<input required type="tel" inputMode="tel" pattern="[+0-9() .-]{10,20}" minLength={10} maxLength={20} value={fastPhone} onChange={(e) => setFastPhone(e.target.value)} placeholder="(00) 00000-0000" /></label><p className="privacy-copy">Nesta versão de pré-lançamento, os dados ficam apenas neste navegador. Antes do lançamento, o Fast-Track será conectado ao CRM e ao WhatsApp oficial.</p><p role="alert">{fastError}</p><button className="btn" type="submit">Continuar pelo WhatsApp →</button></form></> : <><h2>Atendimento identificado.</h2><p>Seu interesse e seus dados foram registrados para evitar perda de contexto caso a transição para o WhatsApp seja interrompida.</p><div className="stage-message"><strong>{whatsappUrl ? "Continue sua conversa" : "Canal em preparação"}</strong><p>{whatsappUrl ? "Se o WhatsApp não abriu, use o link abaixo." : "O WhatsApp oficial ainda não está disponível. Seus dados foram salvos apenas neste navegador; nenhum atendimento foi enviado."}</p>{whatsappUrl && <a className="btn" href={whatsappUrl}>Abrir WhatsApp →</a>}</div><button className="btn" type="button" onClick={closeFastTrack}>Concluir →</button></>}</div></div>}
+      {fastTrack && <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Atendimento direto ME WE CHOICE"><div className="fast-modal"><button className="modal-close" type="button" onClick={closeFastTrack}>×</button><p className="eyebrow">ATENDIMENTO DIRETO</p>{!fastInterest ? <><h2>Já sabe o que procura?</h2><p>Escolha a opção mais próxima. Esta rota é para quem já quer ir direto à conversa.</p><div className="fast-options">{["Consórcio", "Aquisição planejada", "Quero explicar meu objetivo"].map((item) => <button type="button" key={item} onClick={() => setFastInterest(item)}>{item}<span>→</span></button>)}</div><button className="text-link fast-diagnostic" type="button" onClick={() => { closeFastTrack(); setQuizOpen(true); }}>Prefiro organizar meu ponto de partida primeiro →</button></> : !fastCaptured ? <><button className="quiz-back fast-back" type="button" onClick={() => setFastInterest(null)}>← Voltar</button><h2>Antes de continuar</h2><p>Informe seus dados para identificarmos seu atendimento e mantermos a continuidade da conversa.</p><div className="fast-interest-summary"><span>Interesse</span><strong>{fastInterest}</strong></div><form className="lead-form" onSubmit={saveFastTrackLead}><label>Nome<input required value={fastName} onChange={(e) => setFastName(e.target.value)} placeholder="Seu nome" /></label><label>WhatsApp<input required value={fastPhone} onChange={(e) => setFastPhone(e.target.value)} placeholder="(00) 00000-0000" /></label><p className="privacy-copy">Nesta versão de pré-lançamento, os dados ficam apenas neste navegador. Antes do lançamento, o Fast-Track será conectado ao CRM e ao WhatsApp oficial.</p><button className="btn" type="submit">Continuar pelo WhatsApp →</button></form></> : <><h2>Atendimento identificado.</h2><p>Seu interesse e seus dados foram registrados para evitar perda de contexto caso a transição para o WhatsApp seja interrompida.</p><div className="stage-message"><strong>FAST_TRACK_CAPTURADO_SEM_CONVERSA</strong><p>Quando o canal oficial estiver conectado, esta etapa abrirá o WhatsApp e atualizará o status para <code>CONTATO_IMEDIATO</code> após a conversa ser iniciada.</p></div><button className="btn" type="button" onClick={closeFastTrack}>Concluir →</button></>}</div></div>}
     </main>
   );
 }

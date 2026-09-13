@@ -1,63 +1,45 @@
-# ME → WE → CHOICE — Site V3.6
+# ME → WE → CHOICE — Site V3.7 + Interpretation Engine V2.4
 
-Versão pós-red-team e pós-aprovação do diagnóstico guiado da marca **ME → WE → CHOICE**.
+Candidate implementation after independent red-team convergence.
 
-## Principais mudanças da V3.6
+## What changed
+- Hero proportions refined: smaller “PRIMEIRO O PROJETO. DEPOIS, A SOLUÇÃO.” and more compact ME/WE/CHOICE side panel.
+- Fast-track options reduced to: Consórcio, Aquisição planejada, Quero explicar meu objetivo.
+- Structured Input Only: the client never writes free text to the AI.
+- Gemini receives only Safe Structured Context produced by the deterministic Fact Engine.
+- Strict schema and cross-field validation.
+- Observation IDs → canonical approved texts.
+- Output validator blocks recommendations, promises, shadow-advising patterns and unsupported numeric claims.
+- Deterministic V1 fallback on timeout, configuration failure or validator rejection.
+- Consultant Assist implemented as a deterministic server-side helper and must never be returned by the public interpretation endpoint.
+- Identity data stays outside the AI prompt.
 
-- Hero restaurado para a hierarquia visual preferida: **PROJETOS • PLANEJAMENTO • ESCOLHAS**, marca grande **ME → WE → CHOICE** e assinatura **PRIMEIRO O PROJETO. DEPOIS, A SOLUÇÃO.**
-- Categoria **Viagem** adicionada ao diagnóstico, com ramificações e faixas próprias.
-- CTA pós-resultado alterado para **VAMOS PLANEJAR JUNTOS →**, marcando a passagem de ME para WE.
-- Etapas do diagnóstico reorganizadas: categoria/subcategoria → momento de maturidade → prioridades → prazo → faixa opcional.
-- Prioridade atualizada para **Preservar meus recursos**.
-- Faixas de valor dinâmicas para Patrimônio, Imóvel, Veículo, Viagem, Educação e Negócio.
-- Motor de Interpretação V1 ampliado para cruzar maturidade, prazo, prioridades e categoria.
-- Resultado gratuito inclui: **O que isso indica**, **O que vale observar** e **O que ainda precisamos entender**.
-- Nenhuma recomendação automática de produto.
-- Captura posterior de Nome + E-mail + WhatsApp mantém consentimento de marketing separado.
-- Estado CRM-ready atualizado para `diagnostic_version = V3.6`.
-- Fast-track para lead quente inclui mini escolha de interesse e captura mínima de Nome + WhatsApp antes do redirect, com estado `FAST_TRACK_CAPTURADO_SEM_CONVERSA`.
-- Motor de Interpretação V1 mantém composição modular e inclui fallback explícito para cenário de descoberta quase total, evitando falsa personalização.
+## Environment
+Optional AI rendering:
 
-## Importante: pré-lançamento
+```env
+GEMINI_API_KEY=...
+GEMINI_MODEL=...
+GEMINI_TIMEOUT_MS=3500
+```
 
-Esta build **não envia dados para servidor, CRM ou e-mail**. O WhatsApp abre somente após a captura local e quando o número oficial estiver configurado. Sem número, mostra canal em preparação. Para testes, o último lead fica apenas no navegador (`localStorage`, chave `mwc_last_lead`). Isso evita prometer integrações que ainda não foram conectadas.
+If Gemini is not configured, the site works with deterministic fallback automatically.
 
-Antes do lançamento comercial, conectar:
-
-1. CRM / persistência segura server-side.
-2. E-mail transacional do resumo.
-3. WhatsApp oficial / canal comercial.
-4. Agenda oficial.
-5. Política de Privacidade final e revisão jurídica/compliance.
-6. Analytics e funil de conversão.
-
-## Rodar localmente
+## Commands
 
 ```bash
 npm install
+npm run typecheck
+npm run build
 npm run dev
 ```
 
-Abra `http://localhost:3000`.
+## Production controls still required before commercial launch
+- CRM/e-mail/WhatsApp integrations.
+- Rate limiting / bot protection on `/api/interpret`.
+- Separate private CRM webhook for Consultant Assist.
+- Safe observability without PII.
+- Golden Set regression suite and model-drift gate.
+- Privacy policy / consent implementation reviewed for the real production stack.
 
-## Build
-
-```bash
-npm run build
-```
-
-## Deploy na Vercel
-
-Importe o repositório no projeto da ME WE CHOICE. Framework: Next.js. Root: `./`.
-
-## Ajustes finais V3.6
-
-Veja NOTES-V3.6.md. Hero com assinatura menor, painel compacto sem cortes e Fast-track com apenas Consórcio, Aquisição planejada e Quero explicar meu objetivo.
-
-## Configurar WhatsApp
-
-Copie .env.example para .env.local e defina NEXT_PUBLIC_WHATSAPP_NUMBER com país e DDD (somente dígitos). Na Vercel, adicione a mesma variável e faça novo deploy. O número está vazio porque ainda não foi definido. Abrir o link não confirma envio de mensagem nem altera o estado para conversa iniciada.
-
-## Instalação reproduzível e validação
-
-Use npm ci, npm run typecheck e npm run build. Incluímos package-lock.json. Não envie node_modules, .next ou arquivos .env privados ao GitHub.
+Full engine specification: `docs/ENGINE_V2_4.md`.
