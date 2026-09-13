@@ -1,5 +1,8 @@
 "use client";
 
+import { buildSafeContext } from "../lib/engine/fact-engine";
+import { buildFallback } from "../lib/engine/fallback";
+import { validateEngineInput } from "../lib/engine/schema";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type GoalKey = "patrimonio" | "imovel" | "veiculo" | "viagem" | "educacao" | "negocio" | "outros" | "descobrindo";
@@ -260,93 +263,21 @@ function Quiz({ onClose }: { onClose: () => void }) {
   }
 
   function interpretResult() {
-    const p = answers.priorities;
-    const indications: string[] = [];
-    const observe: string[] = [];
-    const pending: string[] = [];
-
-    const discoveryFallback =
-      answers.goal === "descobrindo" &&
-      (!answers.timing || answers.timing === "Ainda não sei") &&
-      (answers.priorities.length === 0 || answers.priorities.includes("Ainda não sei")) &&
-      (!answers.value || answers.value === "Ainda não sei" || answers.value === "Prefiro não informar agora");
-
-    if (discoveryFallback) {
-      return {
-        indications: [
-          "Você ainda está construindo uma visão mais clara sobre o que pretende realizar. Neste momento, mais importante do que comparar soluções é organizar o próprio objetivo.",
-          "Ainda não existem informações suficientes para comparar caminhos de forma útil. Definir aos poucos o que você pretende realizar, em que horizonte e quais critérios mais importam já é parte do planejamento.",
-        ],
-        observe: ["objetivo", "momento", "prioridades", "capacidade de planejamento"],
-        pending: [
-          "o que você gostaria de realizar",
-          "quando isso faria sentido",
-          "quais limites ou prioridades precisam ser respeitados",
-        ],
-      };
+    const parsed = validateEngineInput(toEnginePayload());
+    if (parsed.ok) {
+      const local = buildFallback(buildSafeContext(parsed.value));
+      return { indications: [local.reading], observe: local.attention_points, pending: local.missing_information };
     }
-
-    const stageMap: Record<string, string> = {
-      "Estou começando a pensar": "Você está em uma fase de descoberta. Há espaço para amadurecer o objetivo antes de comparar soluções.",
-      "Já tenho uma ideia mais clara": "Seu objetivo já está mais definido. O próximo passo é transformar essa intenção em critérios objetivos de decisão.",
-      "Estou comparando possibilidades": "Você já entrou na fase de comparação. Agora importa comparar alternativas pelos mesmos critérios, e não por uma condição isolada.",
-      "Quero realizar em breve": "Seu objetivo está mais próximo. Prazo, disponibilidade e capacidade de execução ganham peso antes de qualquer decisão.",
-      "Já sei o que quero": "O objetivo está claro. A próxima etapa é avaliar como viabilizá-lo sem perder de vista custo, prazo e flexibilidade.",
-    };
-    if (answers.stage && stageMap[answers.stage]) indications.push(stageMap[answers.stage]);
-
-    if (answers.timing === "O quanto antes") indications.push("O tempo é um critério central neste cenário; caminhos que exigem espera ou maturação precisam ser avaliados com cuidado.");
-    else if (answers.timing === "Até 6 meses") indications.push("Existe algum espaço para planejamento, mas o prazo ainda é relativamente curto. Liquidez e velocidade de execução merecem atenção.");
-    else if (answers.timing === "6 a 12 meses") indications.push("Há tempo para comparar alternativas e organizar custos e condições antes da decisão.");
-    else if (answers.timing === "1 a 2 anos") indications.push("Seu horizonte permite um planejamento mais estruturado e comparação de diferentes caminhos antes de assumir compromissos.");
-    else if (answers.timing === "Mais de 2 anos") indications.push("O prazo mais longo amplia o espaço para organização e reduz a pressão por uma decisão imediata.");
-    else if (answers.timing === "Ainda não sei") indications.push("Antes de comparar soluções, vale amadurecer o prazo desejável e os critérios que fariam esse objetivo avançar.");
-
-    if (p.includes("Ter previsibilidade") && p.includes("Preservar meus recursos")) indications.push("Você busca avançar com clareza sobre o impacto ao longo do tempo, sem comprometer recursos além do necessário. Previsibilidade e desembolso inicial devem pesar bastante na comparação.");
-    else if (p.includes("Realizar mais rápido") && p.includes("Preservar meus recursos")) indications.push("Seu cenário pede equilíbrio entre velocidade de realização e preservação de recursos, dois critérios que podem apontar para caminhos diferentes.");
-    else if (p.includes("Planejar melhor os custos") && p.includes("Manter flexibilidade")) indications.push("Você quer controlar custos sem perder capacidade de adaptação. Custo total, prazo e regras de mudança merecem ser comparados em conjunto.");
-    else {
-      if (p.includes("Ter previsibilidade")) indications.push("Previsibilidade é uma prioridade; vale observar o impacto financeiro ao longo do tempo, e não apenas o valor inicial.");
-      if (p.includes("Manter flexibilidade")) indications.push("Flexibilidade aparece como critério relevante, então condições muito rígidas merecem atenção adicional.");
-      if (p.includes("Planejar melhor os custos")) indications.push("Organização de custos é central para você; custo total, prazo e impacto recorrente devem ser separados na comparação.");
-      if (p.includes("Preservar meus recursos")) indications.push("Preservar recursos é importante, então necessidade de entrada, liquidez e comprometimento imediato devem entrar na análise.");
-      if (p.includes("Comparar possibilidades")) indications.push("Como comparar alternativas é importante, a próxima etapa deve tornar diferenças de prazo, custo, flexibilidade e condições explícitas.");
-      if (p.includes("Realizar mais rápido")) indications.push("Velocidade de realização pesa na sua decisão, então prazo e disponibilidade precisam ser tratados como critérios centrais.");
-    }
-
-    const criteria: Partial<Record<GoalKey, string[]>> = {
-      patrimonio: ["horizonte", "liquidez", "capacidade financeira", "concentração patrimonial"],
-      imovel: ["entrada", "prazo", "custo total", "impacto mensal", "flexibilidade"],
-      veiculo: ["prazo", "entrada", "custo total", "depreciação", "necessidade imediata"],
-      viagem: ["prazo", "orçamento", "flexibilidade", "pagamentos antecipados", "câmbio quando aplicável"],
-      educacao: ["prazo de início", "duração", "custos totais", "capacidade de pagamento", "retorno pessoal ou profissional"],
-      negocio: ["capital necessário", "prazo", "liquidez", "geração de caixa", "risco operacional"],
-      outros: ["prazo", "custo", "flexibilidade", "prioridades"],
-      descobrindo: ["objetivo", "prazo", "prioridades", "capacidade financeira"],
-    };
-    observe.push(...(criteria[answers.goal || "outros"] || criteria.outros || []));
-
-    if (answers.goal === "imovel") pending.push("disponibilidade para entrada", "capacidade mensal confortável", "urgência real");
-    else if (answers.goal === "veiculo") pending.push("se existe veículo para troca", "uso pessoal ou profissional", "necessidade imediata");
-    else if (answers.goal === "viagem") pending.push("destino e datas", "flexibilidade de calendário", "custos em moeda estrangeira quando aplicável");
-    else if (answers.goal === "negocio") pending.push("capital próprio disponível", "prazo de implementação", "geração de caixa esperada");
-    else if (answers.goal === "educacao") pending.push("data de início", "duração", "forma de pagamento disponível");
-    else if (answers.goal === "patrimonio") pending.push("tipo de aquisição desejada", "horizonte patrimonial", "liquidez necessária");
-    else pending.push("prazo mais adequado", "faixa de valor", "grau de flexibilidade desejado");
-
-    if (!answers.value || answers.value === "Ainda não sei" || answers.value === "Prefiro não informar agora") {
-      pending.unshift("faixa aproximada do objetivo");
-    }
-
     return {
-      indications: Array.from(new Set(indications)).slice(0, 3),
-      observe: Array.from(new Set(observe)).slice(0, 5),
-      pending: Array.from(new Set(pending)).slice(0, 4),
+      indications: ["Podemos conversar sobre o que você pretende realizar e organizar seu ponto de partida."],
+      observe: ["Seu objetivo e os critérios que mais importam para você."],
+      pending: ["O que você gostaria de realizar"],
     };
   }
 
   useEffect(() => {
     if (mappedStep !== "result") return;
+    setEngineReading(null);
     const payload = toEnginePayload();
     if (!payload || answers.goal === "outros") { setEngineReading(null); setEngineSource("local-v1"); return; }
     let cancelled = false;
@@ -466,7 +397,7 @@ function Quiz({ onClose }: { onClose: () => void }) {
         {engineLoading ? <div className="insight-card"><span>ORGANIZANDO SUA LEITURA</span><p>Estamos organizando as informações que você selecionou. Se a camada de IA não responder a tempo, o resultado seguro é exibido automaticamente.</p></div> : <>
           <div className="insight-card"><span>O QUE ISSO INDICA</span>{engineReading ? <p>{engineReading.reading}</p> : result.indications.map((x) => <p key={x}>{x}</p>)}</div>
           <div className="insight-card insight-card--observe"><span>O QUE VALE OBSERVAR</span>{engineReading ? engineReading.attention_points.map((x) => <p key={x}>{x}</p>) : <p>{result.observe.join(" • ")}</p>}</div>
-          <div className="insight-card insight-card--muted"><span>O QUE AINDA PRECISAMOS ENTENDER</span>{engineReading ? engineReading.missing_information.map((x) => <p key={x}>{x}</p>) : <p>{result.pending.join(" • ")}</p>}</div>
+          <div className="insight-card insight-card--muted"><span>O QUE PODEMOS ENTENDER MELHOR</span>{engineReading ? engineReading.missing_information.map((x) => <p key={x}>{x}</p>) : <p>{result.pending.join(" • ")}</p>}</div>
         </>}
         <p className="engine-note">Motor de interpretação: {engineSource === "gemini" ? "leitura linguística personalizada" : "fallback determinístico seguro"}. A IA não recebe seu nome, e-mail ou WhatsApp.</p>
         <p className="legal-note">Esta leitura é informativa e representa apenas uma organização inicial das informações fornecidas por você. Não constitui recomendação de investimento, concessão ou oferta de crédito, nem indicação automática de produto financeiro.</p>

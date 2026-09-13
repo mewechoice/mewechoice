@@ -2,7 +2,7 @@ import { type ConsultantAssist, type SafeContext } from "./types";
 
 const questionMap: Record<string, string> = {
   "Faixa aproximada do objetivo": "Você já tem uma faixa aproximada para esse objetivo?",
-  "Horizonte desejado": "Existe um prazo desejado ou esse horizonte ainda está aberto?",
+  "Prazo desejado": "Você tem um prazo em mente?",
   "Prioridades para a decisão": "O que mais pesa nessa decisão para você hoje?",
   "Disponibilidade inicial": "Existe algum valor que você considera utilizar inicialmente nesse projeto?",
   "Compromisso mensal confortável": "Qual compromisso mensal seria confortável sem pressionar sua organização atual?",
@@ -14,12 +14,12 @@ const questionMap: Record<string, string> = {
   "Duração prevista": "Você já sabe a duração aproximada desse ciclo?",
   "Prazo de implementação": "Em que horizonte essa etapa do negócio precisa estar implementada?",
   "Capital próprio disponível": "Existe algum recurso próprio já reservado para esse projeto?",
-  "Horizonte patrimonial": "Esse objetivo tem um horizonte definido ou ainda está em construção?",
-  "Liquidez que precisa ser preservada": "Existe algum nível de liquidez que você prefere preservar fora desse projeto?",
+  "O que você espera construir com esse patrimônio ao longo do tempo": "O que você espera construir com esse patrimônio ao longo do tempo?",
+  "Quanto você pretende manter disponível para outras necessidades": "Quanto você pretende manter disponível para outras necessidades?",
 };
 
 export function buildConsultantAssist(context: SafeContext): ConsultantAssist {
-  const summary = `${context.known_facts.slice(0, 4).join(". ")}.`;
+  const summary = `${context.known_facts.join(". ")}.`;
   const suggested = context.missing_information.map((m) => questionMap[m]).filter(Boolean).slice(0, 3);
   if (context.tension_level !== "NONE") suggested.unshift("Entre as prioridades que você marcou, qual pesa mais para você neste momento?");
   return {
@@ -31,3 +31,4 @@ export function buildConsultantAssist(context: SafeContext): ConsultantAssist {
     handoff_note: context.tension_level === "MATERIAL" ? "Começar esclarecendo a tensão entre prioridades antes de discutir qualquer caminho." : "Começar confirmando objetivo, prazo e informações ainda abertas antes de discutir qualquer solução.",
   };
 }
+

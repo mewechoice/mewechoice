@@ -1,10 +1,10 @@
 export const ENGINE_VERSION = "2.4" as const;
 export const SITE_DIAGNOSTIC_VERSION = "V3.7" as const;
 export const SCHEMA_VERSION = "1.0" as const;
-export const FACT_ENGINE_VERSION = "1.0" as const;
-export const OBSERVATION_LIBRARY_VERSION = "1.0" as const;
-export const OUTPUT_VALIDATOR_VERSION = "1.0" as const;
-export const CONSULTANT_ASSIST_VERSION = "1.0" as const;
+export const FACT_ENGINE_VERSION = "1.1" as const;
+export const OBSERVATION_LIBRARY_VERSION = "1.1" as const;
+export const OUTPUT_VALIDATOR_VERSION = "1.1" as const;
+export const CONSULTANT_ASSIST_VERSION = "1.1" as const;
 
 export const categories = ["patrimonio", "imovel", "veiculo", "viagem", "educacao", "negocio", "outros", "descobrindo"] as const;
 export type Category = (typeof categories)[number];
@@ -79,6 +79,7 @@ export type SafeContext = {
     fact_engine_version: string;
     observation_library_version: string;
   };
+  narrative_plan: InterpretationOutput;
   known_facts: string[];
   canonical_observations: string[];
   missing_information: string[];

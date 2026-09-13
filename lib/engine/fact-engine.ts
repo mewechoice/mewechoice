@@ -1,4 +1,5 @@
-import { randomUUID } from "crypto";
+import { composeNarrative } from "./composition";
+import { valueLabels } from "./value-labels";
 import {
   FACT_ENGINE_VERSION, OBSERVATION_LIBRARY_VERSION, type EngineInput, type ObservationId,
   type SafeContext, type TensionLevel, type ContextLevel
@@ -41,14 +42,14 @@ function contextLevel(input: EngineInput): ContextLevel {
 function missingFor(input: EngineInput): string[] {
   const out: string[] = [];
   if (["nao_sei", "prefiro_nao_informar"].includes(input.value_range)) out.push("Faixa aproximada do objetivo");
-  if (input.timeline === "nao_sei") out.push("Horizonte desejado");
+  if (input.timeline === "nao_sei") out.push("Prazo desejado");
   if (input.priorities.includes("nao_sei")) out.push("Prioridades para a decisão");
   if (input.category === "imovel") out.push("Disponibilidade inicial", "Compromisso mensal confortável");
   else if (input.category === "veiculo") out.push("Se existe veículo para troca", "Uso principal do veículo");
   else if (input.category === "viagem") out.push("Datas ou janela da viagem", "Flexibilidade de calendário");
   else if (input.category === "educacao") out.push("Data de início", "Duração prevista");
   else if (input.category === "negocio") out.push("Prazo de implementação", "Capital próprio disponível");
-  else if (input.category === "patrimonio") out.push("Horizonte patrimonial", "Liquidez que precisa ser preservada");
+  else if (input.category === "patrimonio") out.push("O que você espera construir com esse patrimônio ao longo do tempo", "Quanto você pretende manter disponível para outras necessidades");
   return Array.from(new Set(out)).slice(0, 3);
 }
 
@@ -68,7 +69,7 @@ function observations(input: EngineInput, level: ContextLevel, t: TensionLevel):
   if (input.priorities.includes("rapidez")) ids.push("OBS_RAPIDEZ_RELEVANTE");
   if (t === "MATERIAL") ids.push("OBS_URGENCIA_E_PRESERVACAO_EM_TENSAO");
   if (t === "MILD") ids.push("OBS_CUSTO_E_FLEXIBILIDADE_EM_TENSAO");
-  return Array.from(new Set(ids)).slice(0, 4);
+  return Array.from(new Set(ids));
 }
 
 export function buildSafeContext(input: EngineInput, sessionUuid?: string): SafeContext {
@@ -76,8 +77,9 @@ export function buildSafeContext(input: EngineInput, sessionUuid?: string): Safe
   const level = contextLevel(input);
   const obsIds = observations(input, level, t);
   return {
+    narrative_plan: composeNarrative(input, labels.subcategory[input.subcategory] || labels.category[input.category], level, t, missingFor(input)),
     lineage: {
-      session_uuid: sessionUuid || randomUUID(),
+      session_uuid: sessionUuid || crypto.randomUUID(),
       engine_version: input.engine_version,
       schema_version: input.schema_version,
       fact_engine_version: FACT_ENGINE_VERSION,
@@ -85,6 +87,7 @@ export function buildSafeContext(input: EngineInput, sessionUuid?: string): Safe
     },
     known_facts: [
       `Objetivo: ${labels.subcategory[input.subcategory] || labels.category[input.category]}`,
+      `Faixa do objetivo: ${valueLabels[input.value_range]}`,
       `Momento: ${labels.maturity[input.maturity]}`,
       `Prazo: ${labels.timeline[input.timeline]}`,
       `Prioridades: ${input.priorities.map((p) => labels.priority[p]).join(" e ")}`,

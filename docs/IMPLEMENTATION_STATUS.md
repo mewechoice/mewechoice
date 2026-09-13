@@ -17,19 +17,15 @@
 - Fast-track limited to Consórcio / Aquisição planejada / Quero explicar meu objetivo.
 - Viagem remains a first-class diagnostic category.
 
-## Verification performed in this workspace
-- TypeScript syntax transpile check: PASS for page + all Engine modules.
-- Engine contract smoke test: PASS.
-- Cross-field invalid category/subcategory test: PASS (rejected).
-- Extra field test: PASS (rejected).
-- Duplicate priority test: PASS (rejected).
-- Priority array >2 test: PASS (rejected).
-- Invalid value-range/category test: PASS (rejected).
-- Fallback output validator test: PASS.
+## Verification — NLG refinement
+- 93,720 valid input combinations: PASS.
+- 31 targeted contract, tone and repetition checks: PASS.
+- 9 API scenarios with mocked Gemini: PASS.
+- TypeScript typecheck: PASS.
+- Next.js production build: PASS (Next.js 15.5.25).
+- Live Gemini evaluation: not performed; no real model was called.
 
-## Not fully verified here
-`npm install` timed out in this execution environment, so a complete `next build` could not be run locally. Vercel should run the production build after upload. If the build fails, use the Vercel build log as the source of truth and correct before production traffic.
-
+Details and example: `NLG_REFINEMENT.md`.
 ## Still required for production launch
 - Configure `GEMINI_API_KEY` and `GEMINI_MODEL` in Vercel environment variables if AI rendering is enabled.
 - Add durable rate limiting/bot protection for `/api/interpret`.
@@ -37,3 +33,4 @@
 - Keep Consultant Assist off the public frontend/API response.
 - Add Golden Set CI and model-drift gate.
 - Review privacy policy and commercial/regulatory wording against the actual production operation.
+

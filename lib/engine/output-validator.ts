@@ -36,5 +36,19 @@ export function validateInterpretationOutput(value: unknown, context: SafeContex
   const safeNumbers = new Set((context.known_facts.join(" ").match(/[0-9]+(?:[.,][0-9]+)?/g) || []));
   const outputNumbers = all.match(/[0-9]+(?:[.,][0-9]+)?/g) || [];
   if (outputNumbers.some((n) => !safeNumbers.has(n))) return { ok: false, reason: "UNSUPPORTED_NUMERIC_CLAIM" };
+  const normalized = all.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  if (bannedInference.test(normalized)) return { ok: false, reason: "UNAUTHORIZED_INFERENCE" };
+  if (/\b(dificil|nao consegue|nao da|impossivel|horizonte patrimonial|liquidez que precisa ser preservada)\b/.test(normalized)) return { ok: false, reason: "INAPPROPRIATE_LANGUAGE" };
+  // Clear points intentionally recap facts; compare prose blocks only.
+  const prose = [obj.reading, ...(obj.attention_points as string[]), obj.next_step] as string[];
+  const sentences = prose.flatMap(p => p.split(/[.!?]+/)).map(p => p.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim()).filter(p => p.length > 25);
+  if (new Set(sentences).size !== sentences.length) return { ok: false, reason: "REPEATED_CONTENT" };
+  for (let i = 0; i < sentences.length; i++) for (let j = i + 1; j < sentences.length; j++) {
+    const a = new Set(sentences[i].split(" ")), b = new Set(sentences[j].split(" "));
+    const shared = [...a].filter(w => b.has(w)).length;
+    if (shared / new Set([...a, ...b]).size > 0.8) return { ok: false, reason: "REPEATED_CONTENT" };
+  }
+  if (JSON.stringify(obj.missing_information) !== JSON.stringify(context.narrative_plan.missing_information)) return { ok: false, reason: "UNSUPPORTED_MISSING_INFORMATION" };
   return { ok: true };
 }
+

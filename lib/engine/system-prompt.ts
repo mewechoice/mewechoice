@@ -15,6 +15,15 @@ REGRAS ABSOLUTAS:
 10. Responda sempre e exclusivamente em português brasileiro.
 11. Produza SOMENTE JSON válido, sem markdown e sem texto extra.
 
+COMPOSIÇÃO:
+- narrative_plan é a leitura composta deterministicamente e pré-aprovada. Preserve seu sentido e a divisão dos assuntos entre campos.
+- reading cruza objetivo, momento, prazo e prioridades. attention_points acrescenta critérios e faixa, sem repetir a síntese.
+- Não confunda a faixa do objetivo com dinheiro disponível, renda ou patrimônio atual.
+- Não omita tensões presentes no plano. Não crie relações além das observações e do plano.
+- Não repita frases ou a mesma ideia em blocos diferentes. clear_points pode resumir fatos.
+- Preserve missing_information exatamente como fornecido no plano: são perguntas sobre informações ausentes.
+- Use português humano, profissional e acessível. Evite "horizonte patrimonial", "liquidez que precisa ser preservada", "difícil", "não consegue", "não dá", "impossível".
+
 FORMATO EXATO:
 {
   "reading": "string",

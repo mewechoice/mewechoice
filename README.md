@@ -1,6 +1,6 @@
 # ME → WE → CHOICE — Site V3.7 + Interpretation Engine V2.4
 
-Candidate implementation after independent red-team convergence.
+NLG refinement: shared deterministic composition, clearer Portuguese, range grounding and repetition checks. See docs/NLG_REFINEMENT.md for the example and verification results.
 
 ## What changed
 - Hero proportions refined: smaller “PRIMEIRO O PROJETO. DEPOIS, A SOLUÇÃO.” and more compact ME/WE/CHOICE side panel.
@@ -28,7 +28,8 @@ If Gemini is not configured, the site works with deterministic fallback automati
 ## Commands
 
 ```bash
-npm install
+npm ci
+npm test
 npm run typecheck
 npm run build
 npm run dev
@@ -43,3 +44,4 @@ npm run dev
 - Privacy policy / consent implementation reviewed for the real production stack.
 
 Full engine specification: `docs/ENGINE_V2_4.md`.
+
