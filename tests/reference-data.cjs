@@ -23,6 +23,16 @@ for(const ref of [
   {...di,value:Infinity},
   {...di,kind:'UNKNOWN'},
   {...di,lineage:{...di.lineage,referencePeriod:''}},
+  {...di,unexpected:'must-fail'},
+  {...financing,recommendedProduct:'must-fail'},
+  {...consortium,partner:'must-fail'},
+  {...di,lineage:{...di.lineage,unexpected:'must-fail'}},
+  {...di,lineage:{...di.lineage,retrievedAt:'ontem'}},
+  {...di,lineage:{...di.lineage,retrievedAt:'2026-09-19'}},
+  {...di,lineage:{...di.lineage,retrievedAt:'2026-13-99T12:00:00Z'}},
 ]) assert.equal(validateVehiclePathReference(ref).ok,false,JSON.stringify(ref));
 
-console.log('Reference Data Contracts: source/unit/kind/lineage constraints passed.');
+assert.equal(validateVehiclePathReference({...di,lineage:{...di.lineage,retrievedAt:'2026-09-19T15:00:00Z'}}).ok,true);
+assert.equal(validateVehiclePathReference({...di,lineage:{...di.lineage,retrievedAt:'2026-09-19T15:00:00.123Z'}}).ok,true);
+
+console.log('Reference Data Contracts: exact keys, source/unit/kind/lineage and timestamp constraints passed.');
