@@ -1,4 +1,5 @@
 import { validateVehiclePathReference } from "../schema";
+import type { LastKnownGoodStore } from "../store";
 import type { VehicleFinancingRateReference } from "../types";
 
 export const BCB_VEHICLE_FINANCING_SERIES = 25471;
@@ -11,6 +12,10 @@ type BcbSgsObservation = { data: string; valor: string };
 export type FinancingReferenceFetchResult =
   | { ok: true; value: VehicleFinancingRateReference }
   | { ok: false; error: "FETCH_FAILED" | "INVALID_PAYLOAD" | "INVALID_REFERENCE" };
+
+export type FinancingReferenceRefreshResult =
+  | { ok: true; status: "UPDATED"; value: VehicleFinancingRateReference }
+  | { ok: false; status: "PRESERVED"; error: FinancingReferenceFetchResult extends infer R ? R extends { ok: false; error: infer E } ? E : never : never };
 
 function isExactObservation(value: unknown): value is BcbSgsObservation {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
@@ -87,4 +92,21 @@ export async function fetchLatestBcbVehicleFinancingReference(
   } catch {
     return { ok: false, error: "FETCH_FAILED" };
   }
+}
+
+export async function refreshBcbVehicleFinancingReference(
+  store: LastKnownGoodStore<VehicleFinancingRateReference>,
+  fetchImpl: typeof fetch = fetch,
+  now: () => Date = () => new Date(),
+): Promise<FinancingReferenceRefreshResult> {
+  const acquired = await fetchLatestBcbVehicleFinancingReference(fetchImpl, now);
+  if (!acquired.ok) return { ok: false, status: "PRESERVED", error: acquired.error };
+
+  const validated = validateVehiclePathReference(acquired.value);
+  if (!validated.ok || validated.value.kind !== "VEHICLE_FINANCING_AVERAGE_RATE") {
+    return { ok: false, status: "PRESERVED", error: "INVALID_REFERENCE" };
+  }
+
+  await store.replace(acquired.value);
+  return { ok: true, status: "UPDATED", value: acquired.value };
 }
