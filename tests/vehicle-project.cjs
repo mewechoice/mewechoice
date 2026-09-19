@@ -45,15 +45,24 @@ assert.equal(unknown.requiredMonths,null);
 const custom=calculateVehicleProject({...base,horizon:{mode:'MONTHS',months:17}});
 assert.equal(custom.futureContributions,25500);
 
+// No arbitrary product caps: large values are accepted while cent-safe arithmetic remains safe.
+const largeSafe={targetValue:2000000000,currentResources:1000000000,monthlyAmount:1000000,horizon:{mode:'MONTHS',months:1201}};
+assert.equal(validateVehicleProjectInput(largeSafe).ok,true);
+assert.equal(calculateVehicleProject(largeSafe).projectedResources,2201000000);
+
 for (const invalid of [
   {...base,targetValue:-1},
   {...base,currentResources:-1},
   {...base,monthlyAmount:-1},
   {...base,targetValue:Infinity},
+  {...base,targetValue:Number.MAX_SAFE_INTEGER},
   {...base,horizon:{mode:'MONTHS',months:0}},
   {...base,horizon:{mode:'MONTHS',months:12.5}},
+  {...base,horizon:{mode:'MONTHS',months:Number.MAX_SAFE_INTEGER}},
+  {...base,currentResources:90000000000000,monthlyAmount:1,horizon:{mode:'MONTHS',months:1}},
+  {...base,monthlyAmount:90000000000000,horizon:{mode:'MONTHS',months:2}},
   {...base,horizon:{mode:'IMMEDIATE',months:0}},
   {...base,extra:'nope'},
 ]) assert.equal(validateVehicleProjectInput(invalid).ok,false,JSON.stringify(invalid));
 
-console.log('Vehicle Project Engine: base, IMMEDIATE, zero, covered, surplus, unknown target, custom horizon and invalid-input cases passed.');
+console.log('Vehicle Project Engine: base, IMMEDIATE, zero, covered, surplus, unknown target, custom horizon, large-safe values and arithmetic-safety rejection cases passed.');
