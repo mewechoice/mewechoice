@@ -1,6 +1,6 @@
 export interface LastKnownGoodStore<T> {
   read(): Promise<T | null>;
-  replaceIfValid(candidate: T): Promise<void>;
+  replace(candidate: T): Promise<void>;
 }
 
 export class MemoryLastKnownGoodStore<T> implements LastKnownGoodStore<T> {
@@ -10,7 +10,7 @@ export class MemoryLastKnownGoodStore<T> implements LastKnownGoodStore<T> {
     return this.value;
   }
 
-  async replaceIfValid(candidate: T): Promise<void> {
+  async replace(candidate: T): Promise<void> {
     this.value = candidate;
   }
 }
