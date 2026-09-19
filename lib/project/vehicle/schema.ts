@@ -4,12 +4,13 @@ export type VehicleValidationResult =
   | { ok: true; value: VehicleProjectInput }
   | { ok: false; error: string };
 
-const MAX_MONEY = 1_000_000_000;
-const MAX_MONTHS = 1_200;
-
 function validMoney(value: unknown, nullable = false): boolean {
   if (nullable && value === null) return true;
-  return typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= MAX_MONEY;
+  return typeof value === "number" && Number.isSafeInteger(value * 100) && value >= 0;
+}
+
+function validMonths(value: unknown): value is number {
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 1;
 }
 
 export function validateVehicleProjectInput(raw: unknown): VehicleValidationResult {
@@ -25,10 +26,12 @@ export function validateVehicleProjectInput(raw: unknown): VehicleValidationResu
   if (horizon.mode === "IMMEDIATE") {
     if (Object.keys(horizon).some((key) => key !== "mode")) return { ok: false, error: "INVALID_IMMEDIATE_HORIZON" };
   } else if (horizon.mode === "MONTHS") {
-    if (!Number.isInteger(horizon.months) || (horizon.months as number) < 1 || (horizon.months as number) > MAX_MONTHS) {
-      return { ok: false, error: "INVALID_HORIZON_MONTHS" };
-    }
+    if (!validMonths(horizon.months)) return { ok: false, error: "INVALID_HORIZON_MONTHS" };
     if (Object.keys(horizon).some((key) => !["mode", "months"].includes(key))) return { ok: false, error: "INVALID_HORIZON" };
+    if (!Number.isSafeInteger(input.monthlyAmount as number * horizon.months * 100)) return { ok: false, error: "UNSAFE_PROJECTION" };
+    if (!Number.isSafeInteger(((input.currentResources as number) + (input.monthlyAmount as number * horizon.months)) * 100)) {
+      return { ok: false, error: "UNSAFE_PROJECTION" };
+    }
   } else {
     return { ok: false, error: "INVALID_HORIZON_MODE" };
   }
