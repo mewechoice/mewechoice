@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "node tests/run.cjs && node tests/api.cjs && node tests/vehicle-project.cjs && node tests/reference-data.cjs"
+    "test": "node tests/run.cjs && node tests/api.cjs && node tests/vehicle-project.cjs && node tests/reference-data.cjs && node tests/bcb-sgs25471.cjs"
   },
   "dependencies": {
     "next": "^15.5.0",
