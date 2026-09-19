@@ -1,9 +1,10 @@
 import type { DiRateReference, VehicleFinancingRateReference, ConsortiumAdminFeeReference } from "../../reference-data/types";
+import { validateVehiclePathReference } from "../../reference-data/schema";
 
 export type Money = number;
 
 function assertMoney(value: number, name: string): void {
-  if (!Number.isFinite(value) || value < 0 || !Number.isSafeInteger(Math.round(value * 100))) {
+  if (!Number.isFinite(value) || value < 0 || !Number.isSafeInteger(value * 100)) {
     throw new RangeError(`${name} must be a non-negative amount safe to represent in cents`);
   }
 }
@@ -48,7 +49,8 @@ export function calculateFinancing(input: { vehicleReferenceValue: Money; downPa
 export function calculateConsortiumReference(input: { creditReference: Money; productTermMonths: number; adminFeeReference: ConsortiumAdminFeeReference }) {
   assertMoney(input.creditReference, "creditReference");
   assertTerm(input.productTermMonths);
-  const fee = input.adminFeeReference.value / 100;
+  const adminFeeReference = assertReference(input.adminFeeReference, "CONSORTIUM_ADMIN_FEE_AVERAGE");
+  const fee = adminFeeReference.value / 100;
   if (!Number.isFinite(fee) || fee < 0) throw new RangeError("consortium administration reference must be non-negative");
   const administrationReference = input.creditReference * fee;
   const baseSimulatedTotal = input.creditReference + administrationReference;
