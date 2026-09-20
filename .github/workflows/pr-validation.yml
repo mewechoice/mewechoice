@@ -23,6 +23,8 @@ jobs:
         run: node tests/vehicle-project-ui.cjs
       - name: Run Project Engine V1 contract test
         run: node tests/project-engine-v1.cjs
+      - name: Run Scenario Lab and CHOICE contract test
+        run: node tests/scenario-choice-v1.cjs
       - name: Run legacy regression suite (diagnostic)
         id: legacy_regression
         continue-on-error: true
