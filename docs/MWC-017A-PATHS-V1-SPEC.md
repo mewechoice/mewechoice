@@ -207,3 +207,27 @@ package.json includes tests/paths-v1.cjs in npm test, but current GitHub evidenc
 
 ## MWC-017I gate
 NOT merge-eligible. The remaining P1s are provenance-boundary issues, not Paths presentation/neutrality issues.
+
+
+## MWC-017K — provenance-boundary re-audit
+Result: PASS WITH RESIDUAL P2 — P0=0; P1=0; P2=1.
+
+Closed:
+- Paths entry consumes authenticated ChoicePathsIntent.
+- ChoicePathsIntent requires runtime-authenticated ChoiceState.
+- Explicit financing/consortium path inputs are field-bound, path-bound and now session-bound to an authenticated Paths intent.
+- Structurally forged explicit-input artifacts fail closed.
+- Cross-path input substitution fails closed.
+- Official path references must pass the strict reference schema and be wrapped as runtime-authenticated ValidatedVehiclePathReference artifacts before Paths can consume them.
+- Structurally forged validated-reference wrappers fail closed.
+- Invalid source/unit/kind/lineage combinations fail validation.
+- Card slots remain symmetric; publication is always present as AuthorizedPublication|null.
+- Availability cannot reorder, hide, elevate, focus or expand another path.
+- No Paths-local arithmetic or cross-path ranking/comparison was introduced.
+- Direct adversarial suite now covers the 22 mandatory cases plus forged input-session coverage.
+
+Residual P2-017K-01:
+No independent CI execution evidence is available for the current head. The test is wired into npm test, but GitHub exposes no Actions run and Vercel checks are blocked by account build-rate-limit. This is infrastructure/evidence debt, not a demonstrated implementation defect.
+
+Gate:
+Implementation is merge-eligible subject to explicit Owner merge authorization. No merge performed by this mission.
