@@ -17,11 +17,23 @@ jobs:
       - run: npm run typecheck
       - name: Run editorial structural test
         run: node tests/editorial-v1.cjs
-      - name: Run full regression suite
-        id: regression
+      - name: Run deterministic regression suite
+        run: |
+          node tests/run.cjs
+          node tests/vehicle-project.cjs
+          node tests/reference-data.cjs
+          node tests/bcb-sgs25471.cjs
+          node tests/vehicle-path-engine.cjs
+          node tests/fact-engine-v2.cjs
+          node tests/output-validator-v2.cjs
+          node tests/publication-pipeline-v1.cjs
+          node tests/scenario-lab-v1.cjs
+          node tests/paths-v1.cjs
+      - name: Run environment-dependent API integration test
+        id: api_integration
         continue-on-error: true
-        run: npm test
+        run: node tests/api.cjs
       - run: npm run build
-      - name: Report known integration-test dependency
-        if: steps.regression.outcome == 'failure'
-        run: echo 'Full regression suite has an environment-dependent API expectation; inspect logs. Editorial test, typecheck and build remain independently gated.'
+      - name: Report API integration dependency
+        if: steps.api_integration.outcome == 'failure'
+        run: echo 'API integration test requires the Gemini runtime expectation; deterministic regression, editorial test, typecheck and build are independently gated.'
