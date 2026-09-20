@@ -16,4 +16,8 @@ assert.equal(choice.selectedPath,null); assert.equal(choice.recommendation,null)
 assert.throws(()=>buildScenarioLab({...reading,authority:{...reading.authority,selectedPath:"CONSORTIUM"}}),/SCENARIO_AUTHORITY_BREACH/);
 assert.throws(()=>buildChoiceState({...scenario,choices:{...scenario.choices,pathsRequested:true}}),/INVALID_CHOICE_SOURCE/);
 assert.throws(()=>buildChoiceState({...scenario,choices:{...scenario.choices,recommendation:"x"}}),/CHOICE_AUTHORITY_BREACH/);
+assert.throws(()=>buildScenarioLab(null),/INVALID_SCENARIO_SOURCE/);
+assert.throws(()=>buildScenarioLab({...reading,engineVersion:"9.9.9"}),/INVALID_SCENARIO_SOURCE/);
+assert.throws(()=>buildChoiceState(null),/INVALID_CHOICE_SOURCE/);
+assert.throws(()=>buildChoiceState({...scenario,version:"9.9.9"}),/INVALID_CHOICE_SOURCE/);
 console.log("scenario-choice-v1: PASS");
