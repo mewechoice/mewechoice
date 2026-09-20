@@ -128,3 +128,70 @@ Before implementation freeze:
 - explicit tests for funnel illusion, commercial contamination, advice drift, clickbait and taxonomy collision;
 - Owner naming freeze after sufficient evidence;
 - implementation only after corrected spec passes re-audit.
+
+
+---
+
+# MWC-018G — Independent Adversarial Spec Audit
+
+## Audit posture
+Read-only adversarial review of MWC-018F. Objective: falsify the specification before implementation.
+
+## Findings
+
+### P0 — none
+No critical architecture defect requires abandonment of the editorial model.
+
+### P1-01 — Editorial → product CTA authority is underspecified
+The spec says transitions to Meu Projeto must be contextual and voluntary, but does not define a typed/explicit authority boundary. An implementation could infer a CTA or prefill from article/topic behavior while claiming it is contextual.
+
+**Required correction:** editorial surfaces may display a neutral static entry to Meu Projeto, but no article-derived parameter, path, topic, reading behavior or inferred intent may be transferred into product state unless the user explicitly enters it in the product surface.
+
+### P1-02 — Related-reading personalization boundary is too permissive
+"Content relationships" is undefined. A recommender could use behavioral profiling and still describe the output as content-related.
+
+**Required correction:** V1 related reading must be deterministic/editorial (topic/tag/manual relation) and must not use financial profile, CRM state, product state, commercial value, partner economics, inferred suitability or behavioral scoring.
+
+### P1-03 — Advertising boundary defers too much
+A future policy is mentioned, but the current spec does not state whether V1 itself contains ads. This leaves an implementation ambiguity.
+
+**Required correction:** V1 advertising = OFF. Monetization requires a separate Owner-approved mission. No sponsored placement, affiliate prioritization or native-ad simulation in V1.
+
+### P1-04 — Factual article governance lacks publication authority
+"Sources/methodology when factual claims require them" is discretionary and no distinction is made between evergreen explanation, current rates, statistics and modeled examples.
+
+**Required correction:** define article claim classes and minimum provenance rules. Current rates/statistics require dated source/reference metadata; modeled examples must be labeled examples; product-specific conditions require authoritative product source and must not be generalized.
+
+### P1-05 — Success metrics can create optimization pressure inconsistent with editorial quality
+Open rate/scroll/second article can incentivize clickbait or infinite-scroll mechanics.
+
+**Required correction:** metrics are observational in V1; no automated ranking, headline optimization, content suppression or product-state changes based on engagement metrics.
+
+### P1-06 — "Antes da Escolha" can still look like a mandatory stage
+The spec separates navigation and masthead but does not explicitly prevent progress indicators or journey sequencing around the editorial masthead.
+
+**Required correction:** no step number, progress bar, required-completion language or visual sequence may position the editorial area as a prerequisite to CHOICE/Meu Projeto.
+
+## P2 observations
+1. Reading-time metadata may imply precision; define it as optional estimate if used.
+2. Byline/review metadata needs ownership semantics before external contributors exist.
+3. Topic families could eventually collide with product taxonomy; maintain separate editorial topic IDs.
+4. Search/social deep links need a first-visit cue that identifies MWC and the editorial nature without requiring Home context.
+5. Accessibility requirements are absent (semantic headings, keyboard navigation, readable contrast, alt text, reduced motion).
+
+## Adversarial scenarios
+- User reads consortium article then enters Meu Projeto: **must start neutral**, with no consortium path selected or inferred.
+- User reads five financing articles: **must not become "financing-interested" for product logic**.
+- High-CTR sensational headline: engagement must not override editorial claim rules.
+- Future advertiser pays more: cannot alter article/path ranking in V1.
+- User lands from Google directly on an article: article must stand alone as editorial content and not masquerade as product advice.
+- User has already purchased a vehicle: editorial destination remains valid; no forced "before your decision" journey semantics.
+- DI/BCB rate becomes stale: article must not present historical/current-sensitive values as current without dated provenance.
+
+## Verdict
+**FAIL — CORRECTABLE**
+P0 = 0
+P1 = 6
+P2 = 5
+
+The architecture is viable, but implementation should not begin until the six P1 controls are made binding and re-audited.
