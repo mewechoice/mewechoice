@@ -138,3 +138,29 @@ In addition to the original red-team questions, implementation MUST prove:
 Result: PASS. P0=0; P1=0. P2=0 open at specification level.
 
 The four P1 findings from MWC-016B are closed by explicit user-directed scenario generation, deterministic creation-order presentation, CHOICE steering firewall, and canonical-input comparison-precondition proof. The P2 unavailable/zero ambiguity is also closed. Implementation is eligible, but remains prohibited from merge until implementation audit and Owner authorization.
+
+
+## MWC-016F — Implementation adversarial audit
+Result: FAIL — P0=0; P1=3; P2=1.
+
+### P1-016F-01 — user-directed edit authority is not closed
+createUserScenario accepts Partial<ScenarioInput>. This allows edits to canonical reference objects (rateReference, adminFeeReference, diReference) and referenceFreshness, even though the corrected V1 contract limits scenarios to explicit project-variable edits. A caller can therefore manufacture a “user scenario” by changing reference evidence rather than a user-controlled project variable.
+
+Required correction: define route-specific UserScenarioEdit types containing only user-editable project fields. References, freshness, route, baselineProjectId and all lineage/identity fields are inherited from baseline and cannot be supplied through the edit API.
+
+### P1-016F-02 — identity/order fields remain caller-authoritative
+scenarioId and createdOrder are caller supplied. Duplicate scenario IDs or duplicate/negative creation order are not rejected, and orderScenarios trusts createdOrder. This permits ambiguous lineage and presentation ordering, undermining the order firewall.
+
+Required correction: introduce deterministic collection-level validation: baseline createdOrder MUST equal 0; user scenarios MUST have positive unique integer createdOrder and unique scenarioId within a scenario set. orderScenarios must fail closed on invalid/duplicate identity/order rather than silently sort.
+
+### P1-016F-03 — comparison precondition function does not produce auditable proof
+canCompareFinancingScenarios returns only boolean. The corrected spec requires preservation of scenario IDs and proven equal input fields in comparison lineage before Claim Registry invocation. Current implementation cannot carry that proof and therefore is not sufficient as the comparison gate.
+
+Required correction: replace/augment boolean gate with a typed ComparisonPreconditionProof containing scenario IDs, route, provenEqualFields and exact productTermMonths; return failure when proof cannot be constructed. Actual comparison claim construction remains outside this narrow module unless separately integrated through Claim Registry.
+
+### P2-016F-04 — nested input immutability is shallow at record boundary
+record freezes only the top-level cloned input. Nested reference/lineage objects remain mutable through ScenarioRecord.input, creating avoidable lineage-integrity ambiguity even though downstream publications are separately frozen.
+
+Required correction: deep-freeze the cloned scenario input/reference lineage.
+
+Gate: implementation remains NOT merge-eligible until P1 corrections are implemented and independently re-audited.
