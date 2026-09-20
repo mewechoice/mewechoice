@@ -1,7 +1,8 @@
 const fs=require("fs"),path=require("path"),ts=require("typescript"),Module=require("module");
 const cache=new Map();function load(file){file=path.resolve(file);if(cache.has(file))return cache.get(file);let src=fs.readFileSync(file,"utf8"),js=ts.transpileModule(src,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,m=new Module(file,module);cache.set(file,m.exports);m.filename=file;m.paths=module.paths;m.require=function(id){if(id.startsWith(".")){let p=path.resolve(path.dirname(file),id);if(!path.extname(p))p+=".ts";if(fs.existsSync(p))return load(p)}return Module.prototype.require.call(m,id)};m._compile(js,file);cache.set(file,m.exports);return m.exports}
 const p=load(path.join(__dirname,"../lib/engine/paths-v1.ts"));
-let blocked=false;try{p.buildPathsView({authority:{origin:"CHOICE_UNDERSTAND_PATHS"}})}catch(e){blocked=String(e).includes("PATHS_ENTRY_NOT_AUTHORIZED")}if(!blocked)throw Error("01 forged authority accepted");\nconst ua=p.captureExplicitUserAction("UNDERSTAND_PATHS");const auth=p.authorizePathsEntryFromUserAction(ua);const v=p.buildPathsView({authority:auth});
+let blocked=false;try{p.buildPathsView({authority:{origin:"CHOICE_UNDERSTAND_PATHS"}})}catch(e){blocked=String(e).includes("PATHS_ENTRY_NOT_AUTHORIZED")}if(!blocked)throw Error("01 forged authority accepted");
+const ua=p.captureExplicitUserAction("UNDERSTAND_PATHS");const auth=p.authorizePathsEntryFromUserAction(ua);const v=p.buildPathsView({authority:auth});
 if(v.cards.map(x=>x.pathId).join(",")!=="ACCUMULATION,FINANCING,CONSORTIUM")throw Error("02 taxonomy order changed");
 if(v.focusedPath!==null||v.cards.some(x=>x.expanded))throw Error("03 default focus/expansion");
 if(v.cards.some(x=>x.action!=="INSPECT_OR_SIMULATE"))throw Error("04 asymmetric action");
