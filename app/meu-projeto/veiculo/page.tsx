@@ -7,7 +7,23 @@ type Horizon = "IMMEDIATE" | "12" | "24" | "36" | "48" | "60" | "OTHER";
 
 const money = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
 
-function parseMoney(value:string){const n=Number(value.replace(/\./g,"").replace(",",".").replace(/[^0-9.-]/g,""));return Number.isFinite(n)&&n>=0?n:null;}
+function parseMoney(value:string){
+ const raw=value.trim().replace(/R\\$/gi,"").replace(/\\s/g,"");
+ if(!raw)return null;
+ let normalized=raw;
+ if(raw.includes(",")){
+  if((raw.match(/,/g)||[]).length!==1)return null;
+  normalized=raw.replace(/\\./g,"").replace(",",".");
+ }else if(raw.includes(".")){
+  const parts=raw.split(".");
+  if(parts.length===2&&parts[1].length<=2) normalized=raw;
+  else if(parts.slice(1).every(part=>part.length===3)) normalized=parts.join("");
+  else return null;
+ }
+ if(!/^\\d+(?:\\.\\d{1,2})?$/.test(normalized))return null;
+ const n=Number(normalized);
+ return Number.isFinite(n)&&n>=0?n:null;
+}
 
 export default function MeuProjetoVeiculo(){
  const [target,setTarget]=useState(""); const [resources,setResources]=useState(""); const [monthly,setMonthly]=useState("");
