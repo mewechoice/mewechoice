@@ -12,9 +12,9 @@ export type ConsortiumScenarioInput=Common&{route:"CONSORTIUM";creditReference:n
 export type ScenarioInput=AccumulationScenarioInput|FinancingScenarioInput|ConsortiumScenarioInput;
 export type ScenarioRecord=Readonly<{scenarioId:string;baselineProjectId:string;route:ScenarioRoute;createdOrder:number;changedFields:readonly string[];input:Readonly<ScenarioInput>;status:ScenarioStatus;publication?:AuthorizedPublication;unavailableReason?:string}>;
 export type ChoiceAction="ADJUST_PLAN"|"VIEW_SCENARIO_DETAILS"|"UNDERSTAND_PATHS"|"SAVE_PROJECT"|"CONTACT_CONSULTANT";
-export type ChoiceState=Readonly<{headline:"O próximo passo é seu.";actions:readonly ChoiceAction[];primaryAction?:Exclude<ChoiceAction,"CONTACT_CONSULTANT">|"CONTACT_CONSULTANT"}>;
+export type ChoiceState=Readonly<{headline:"O próximo passo é seu.";actions:readonly ChoiceAction[];primaryAction?:ChoiceAction}>;\nexport type AccumulationScenarioEdit=Readonly<{scenarioId:string;createdOrder:number;currentResources?:number;monthlyContribution?:number;projectHorizonMonths?:number}>;\nexport type FinancingScenarioEdit=Readonly<{scenarioId:string;createdOrder:number;vehicleReferenceValue?:number;allocatedDownPayment?:number;productTermMonths?:number}>;\nexport type ConsortiumScenarioEdit=Readonly<{scenarioId:string;createdOrder:number;creditReference?:number;productTermMonths?:number}>;\nexport type UserScenarioEdit=AccumulationScenarioEdit|FinancingScenarioEdit|ConsortiumScenarioEdit;\nexport type ComparisonPreconditionProof=Readonly<{leftScenarioId:string;rightScenarioId:string;route:"FINANCING";provenEqualFields:readonly ["productTermMonths"];productTermMonths:number}>;
 
-function clone<T>(x:T):T{return structuredClone(x)}
+function clone<T>(x:T):T{return structuredClone(x)}\nfunction deepFreeze<T>(x:T):T{if(x&&typeof x==="object"){Object.freeze(x);for(const v of Object.values(x as any))deepFreeze(v)}return x}
 function changed(base:ScenarioInput,next:ScenarioInput):string[]{
  const ignored=new Set(["scenarioId","baselineProjectId","createdOrder","referenceFreshness","route"]);
  return Object.keys(next).filter(k=>!ignored.has(k)&&JSON.stringify((base as any)[k])!==JSON.stringify((next as any)[k])).sort();
@@ -25,7 +25,7 @@ function run(i:ScenarioInput):PipelineResult{
  return publishConsortium({...i,publicationId:`scenario.${i.scenarioId}`});
 }
 function record(input:ScenarioInput,base:ScenarioInput):ScenarioRecord{
- const r=run(input),core={scenarioId:input.scenarioId,baselineProjectId:input.baselineProjectId,route:input.route,createdOrder:input.createdOrder,changedFields:Object.freeze(changed(base,input)),input:Object.freeze(clone(input))};
+ const r=run(input),core={scenarioId:input.scenarioId,baselineProjectId:input.baselineProjectId,route:input.route,createdOrder:input.createdOrder,changedFields:Object.freeze(changed(base,input)),input:deepFreeze(clone(input))};
  return Object.freeze(r.ok?{...core,status:"AUTHORIZED" as const,publication:r.publication}:{...core,status:"UNAVAILABLE" as const,unavailableReason:r.reason});
 }
 export function createBaseline(input:ScenarioInput):ScenarioRecord{return record(clone(input),input)}
