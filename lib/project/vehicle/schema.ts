@@ -28,7 +28,8 @@ export function validateVehicleProjectInput(raw: unknown): VehicleValidationResu
   } else if (horizon.mode === "MONTHS") {
     if (!validMonths(horizon.months)) return { ok: false, error: "INVALID_HORIZON_MONTHS" };
     if (Object.keys(horizon).some((key) => !["mode", "months"].includes(key))) return { ok: false, error: "INVALID_HORIZON" };
-    if (!Number.isSafeInteger(input.monthlyAmount as number * horizon.months * 100)) return { ok: false, error: "UNSAFE_PROJECTION" };\n    if (!Number.isSafeInteger(input.currentResources as number * 100)) return { ok: false, error: "UNSAFE_PROJECTION" };
+    if (!Number.isSafeInteger(input.monthlyAmount as number * horizon.months * 100)) return { ok: false, error: "UNSAFE_PROJECTION" };
+    if (!Number.isSafeInteger(input.currentResources as number * 100)) return { ok: false, error: "UNSAFE_PROJECTION" };
     if (!Number.isSafeInteger(((input.currentResources as number) + (input.monthlyAmount as number * horizon.months)) * 100)) {
       return { ok: false, error: "UNSAFE_PROJECTION" };
     }
