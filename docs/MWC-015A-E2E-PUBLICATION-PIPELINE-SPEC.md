@@ -90,3 +90,21 @@ Result: PASS. P0=0; P1=0. The corrected contract is implementation-eligible. Re-
 
 ## Gate
 015A is specification only. MWC-015B completed with two P1 findings corrected in-spec. Implementation is prohibited until 015B findings are synthesized/corrected and the final integration spec passes re-audit.
+
+
+## MWC-015E implementation audit
+Result: PASS WITH RESIDUAL P2. P0=0; P1=0; P2=1.
+
+Verified on implementation head 7eba596f4dba170a61dd8dc354967979fc03c4f6:
+- all three route entry points create CalculationEvidence internally and feed canonical Fact Engine builders;
+- deterministic value claims are built through Claim Registry V2;
+- publication is returned only after Output Validator V2 authorization;
+- route publication allowlists remain closed and no comparison claim is built automatically;
+- financing requires explicit allocatedDownPayment and productTermMonths;
+- consortium publication retains PARTIAL semantics and non-contractual labels;
+- runtime integration tests replaced the earlier structural-only checks;
+- both Vercel deployment checks for the audited head reported success and GitHub reported the PR mergeable.
+
+Residual P2-015E-01 — pre-existing calculation evidence hardening debt: fact-calculation-boundary exports CALCULATION_EVIDENCE and uses shallow freezing. The 015 pipeline does not accept external CalculationEvidence and constructs it internally, so this does not create an open P1 in the closed E2E facade. Track as a separate hardening item; do not silently widen MWC-015.
+
+Gate: implementation audit complete. Merge remains prohibited without explicit Owner authorization.
