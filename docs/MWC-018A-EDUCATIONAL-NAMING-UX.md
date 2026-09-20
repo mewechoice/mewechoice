@@ -45,3 +45,18 @@ Even if one umbrella label is selected, article-level and project-level CTAs sho
 
 ## Gate
 No educational-area implementation until naming/UX red-team is complete and the Owner approves the naming decision.
+
+
+## Owner clarification — editorial reading experience
+The educational area is fundamentally an ARTICLE destination. Success is not merely navigation CTR or information retrieval. The experience must make people want to open an article, enjoy reading it, continue to another article, and return later.
+
+Therefore naming and UX evaluation must also test:
+- editorial warmth and curiosity;
+- perceived reading pleasure;
+- whether the label suggests a library/magazine/editorial destination rather than a course or classroom;
+- article-to-article discovery;
+- return/read-again potential;
+- compatibility with narrative, useful and human writing;
+- whether article titles can carry most of the click motivation while the umbrella label remains clear.
+
+This clarification weakens any candidate that sounds instructional, bureaucratic or like formal training. "Aprender" and "Entenda" remain hypotheses, not decisions.
