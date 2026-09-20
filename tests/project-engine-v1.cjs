@@ -26,4 +26,7 @@ assert.equal(surplus.requiredMonthlyAmount,0);
 assert.equal(surplus.requiredMonths,0);
 assert.equal(surplus.authority.recommendation,null);
 
+assert.throws(()=>buildProjectEngineReading(null),/INVALID_PROJECT_ENGINE_SOURCE/);
+assert.throws(()=>buildProjectEngineReading({}),/INVALID_PROJECT_ENGINE_SOURCE/);
+
 console.log("project-engine-v1: PASS");
