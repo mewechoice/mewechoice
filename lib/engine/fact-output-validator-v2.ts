@@ -8,12 +8,11 @@ export function validateFactPublication(fact:Fact, publication:FactPublication):
   if(fact.state.validation!=="VALIDATED") return {ok:false,reason:"FACT_INVALID"};
   if(fact.state.authorization==="NOT_AUTHORIZED") return {ok:false,reason:"FACT_NOT_AUTHORIZED"};
   const supplied=new Set(publication.disclosures);
+  const required=new Set(fact.requiredDisclosures);
   if(fact.requiredDisclosures.some(d=>!supplied.has(d))) return {ok:false,reason:"REQUIRED_DISCLOSURE_MISSING"};
+  if(publication.disclosures.some(d=>!required.has(d))) return {ok:false,reason:"UNAUTHORIZED_DISCLOSURE"};
   const allowed=new Set([String(fact.value.exactValue),fact.value.displayValue]);
   if(!allowed.has(publication.renderedValue)) return {ok:false,reason:"UNAUTHORIZED_VALUE_REPRESENTATION"};
   return {ok:true};
 }
 
-export function assertNoDisplayValueAsCalculationInput(_value:never):never {
-  throw new Error("DISPLAY_VALUE_MUST_NOT_ENTER_CALCULATION_ENGINE");
-}
