@@ -164,3 +164,24 @@ record freezes only the top-level cloned input. Nested reference/lineage objects
 Required correction: deep-freeze the cloned scenario input/reference lineage.
 
 Gate: implementation remains NOT merge-eligible until P1 corrections are implemented and independently re-audited.
+
+
+## MWC-016G — Final implementation re-audit
+Result: PASS WITH RESIDUAL P2 — P0=0; P1=0; P2=1.
+
+Re-audited head: 212dacc24ff7b2e5f305df5dbb70f2c639232fe9.
+
+Closed findings:
+- P1-016F-01 CLOSED: user scenario edit surface is route-specific and excludes canonical reference/freshness/lineage fields.
+- P1-016F-02 CLOSED: baseline order, positive user-scenario order, duplicate scenario ID and duplicate order are fail-closed.
+- P1-016F-03 CLOSED: financing comparison preconditions now produce typed ComparisonPreconditionProof with scenario IDs and proven productTermMonths equality.
+- P2-016F-04 CLOSED: scenario input/reference lineage is recursively frozen at the ScenarioRecord boundary.
+
+Verification evidence:
+- adversarial suite committed with 16 checks covering baseline immutability, edit lineage, ordering/identity failures, comparison proof, unavailable semantics, CHOICE neutrality and nested freeze;
+- Vercel checks for both mewechoice and mewechoice-site are SUCCESS on the re-audited head.
+
+Residual P2:
+- repository has no independent CI workflow proving the CJS adversarial suite execution as a separate required check. Vercel SUCCESS proves build/deployment acceptance, not by itself the runtime execution of every CJS assertion. This is non-blocking for MWC-016 because the suite is committed and source/build gates are clean, but dedicated CI remains recommended technical debt.
+
+MERGE GATE: technically eligible for Owner authorization. No merge is authorized by this audit.
