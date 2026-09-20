@@ -56,3 +56,35 @@ A path result is AUTHORIZED or UNAVAILABLE. No invented values, stale substitute
 
 ## Gate
 Specification only. Next: MWC-017B independent adversarial red-team. No implementation authorized.
+
+
+## MWC-017B — Independent adversarial red-team
+Result: FAIL — P0=0; P1=4; P2=1.
+
+### P1-017B-01 — entry intent is semantic, not typed authority
+The specification says Paths opens after explicit intent, but defines no closed token/state proving that intent. Any caller could invoke the future Paths layer directly and label the invocation explicit.
+
+Required correction: V1 must accept a typed PathsEntryAuthority created only by the CHOICE action UNDERSTAND_PATHS or by an explicit named-path user action. No profile-derived/internal boolean is sufficient.
+
+### P1-017B-02 — “equal presentation priority” is not machine-testable
+The current Output Validator exposes PRESENTATION_ASYMMETRY but does not implement a symmetry check. The spec therefore relies on prose while cards could differ in prominence, missing fields or CTA priority.
+
+Required correction: define a deterministic PathCardViewModel with the same ordered field slots and action class for every path. Missing values occupy UNAVAILABLE slots rather than disappearing. No featured/recommended/promoted property exists in V1.
+
+### P1-017B-03 — path availability can become implicit recommendation
+The spec permits unavailable paths, but does not forbid the remaining available path from being elevated, auto-opened or described as the surviving/viable option. That would convert failure isolation into recommendation.
+
+Required correction: availability changes status only. It must not change ordering, emphasis, CTA priority or automatically select another path. An unavailable path remains visible in its taxonomy position with a neutral reason.
+
+### P1-017B-04 — path-specific input acquisition can smuggle inferred product parameters
+The spec states product term/down payment require explicit values but does not define provenance. A UI/service could prefill those values from project horizon/current resources and later treat them as user inputs.
+
+Required correction: path-dependent inputs must carry explicit USER_ENTERED provenance. Financing allocatedDownPayment/productTermMonths and consortium productTermMonths cannot be initialized from project fields, defaults, presets or partner terms. Reference data is SYSTEM_REFERENCE and cannot be user-edited.
+
+### P2-017B-05 — static taxonomy order needs accessibility/interaction neutrality
+Visual order alone is insufficient if keyboard focus, DOM order or default expanded state differs.
+
+Required correction: DOM/focus order follows the same fixed taxonomy; no path is expanded/focused by default; explicit user interaction may expand exactly the requested path.
+
+## MWC-017B gate
+Specification is NOT implementation-eligible until all P1 findings are bound into the contract and re-audited.
