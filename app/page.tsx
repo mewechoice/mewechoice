@@ -489,9 +489,7 @@ export default function Home() {
       <header className="site-header shell">
         <a href="#top" className="logo-link"><BrandMark compact /></a>
         <nav className="nav" aria-label="Navegação principal">
-          <a href="#metodo">Nosso método</a>
-          <a href="#processo">Como funciona</a>
-          <a href="#transparencia">Transparência</a>\n          <a href="/descobrir">Explore</a>
+          <a href="#top">Início</a>\n          <a href="#diagnostico">Meu Projeto</a>\n          <a href="/descobrir">Explore</a>\n          <a href="#metodo">Nosso método</a>\n          <a href="#transparencia">Transparência</a>
         </nav>
         <button className="header-consult" type="button" onClick={() => setFastTrack(true)}>Falar com um consultor →</button>
       </header>
@@ -503,7 +501,7 @@ export default function Home() {
           <h1>PRIMEIRO O PROJETO.<br />DEPOIS, A SOLUÇÃO.</h1>
           <p className="hero-lead">Organizamos objetivos, possibilidades e caminhos para decisões de aquisição, patrimônio e projetos pessoais.</p>
           <div className="hero-actions">
-            <button className="btn" type="button" onClick={() => setQuizOpen(true)}>O que você quer realizar? →</button>
+            <button className="btn" type="button" onClick={() => setQuizOpen(true)}>Começar Meu Projeto →</button>
             <a className="text-link" href="#processo">Entenda como funciona ↓</a>
           </div>
           <button type="button" className="hero-fast" onClick={() => setFastTrack(true)}>Já sabe o que procura? <strong>Fale com um consultor →</strong></button>
@@ -577,12 +575,10 @@ export default function Home() {
       <section id="diagnostico" className="diagnostic-section">
         <div className="shell diagnostic-card">
           <div>
-            <p className="eyebrow eyebrow--light">SEU PONTO DE PARTIDA</p>
-            <h2>O que você quer realizar?</h2>
-            <p>Em poucos passos, organize objetivo, momento e prioridades. Você recebe a leitura inicial antes de informar seus dados.</p>
+            <p className="eyebrow eyebrow--light">MEU PROJETO</p>\n            <h2>Comece pelo que você quer realizar.</h2>\n            <p>Organize objetivo, momento e prioridades primeiro. Seus dados de contato ficam para depois da leitura inicial.</p>
           </div>
           <div className="diagnostic-actions">
-            <button className="btn" type="button" onClick={() => setQuizOpen(true)}>Começar agora →</button>
+            <button className="btn" type="button" onClick={() => setQuizOpen(true)}>Começar Meu Projeto →</button>
             <span>≈ 30–45 segundos</span>
           </div>
         </div>
