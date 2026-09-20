@@ -17,6 +17,8 @@ jobs:
       - run: npm run typecheck
       - name: Run editorial structural test
         run: node tests/editorial-v1.cjs
+      - name: Run Home production architecture test
+        run: node tests/home-production.cjs
       - name: Run legacy regression suite (diagnostic)
         id: legacy_regression
         continue-on-error: true
