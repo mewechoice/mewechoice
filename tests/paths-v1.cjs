@@ -15,7 +15,7 @@ if(missing.cards[1].publicationStatus!=="INPUT_REQUIRED")throw Error("07 inferre
 const av=p.buildPathsView({intent,accumulation:{currentResources:10000,monthlyContribution:1000,projectHorizonMonths:12}});
 if(av.cards[0].publicationStatus!=="AUTHORIZED")throw Error("08 no-yield accumulation blocked");
 if(av.cards[1].publicationStatus!=="INPUT_REQUIRED"||av.cards[2].publicationStatus!=="INPUT_REQUIRED")throw Error("09 isolation");
-const down=ib.recordExplicitPathInput("FINANCING","allocatedDownPayment",20000),term=ib.recordExplicitPathInput("FINANCING","productTermMonths",48);
+const down=ib.recordExplicitPathInput(intent,"FINANCING","allocatedDownPayment",20000),term=ib.recordExplicitPathInput(intent,"FINANCING","productTermMonths",48);
 const goodFin=p.buildPathsView({intent,financing:{vehicleReferenceValue:100000,allocatedDownPayment:down,productTermMonths:term,rateReference:finAuth}});
 if(goodFin.cards[1].publicationStatus!=="AUTHORIZED")throw Error("10 financing blocked");
 if(goodFin.cards.map(x=>Object.keys(x).sort().join(",")).some((x,_,a)=>x!==a[0]))throw Error("11 mixed slots");
@@ -27,7 +27,8 @@ let wrongPrimary=false;try{b.emitChoicePathsIntent(ch.buildChoiceState("CONTACT"
 if(p.captureExplicitUserAction||p.captureUserValue||p.captureSystemReference||p.authorizePathsEntryFromUserAction)throw Error("17 obsolete minting API exported");
 if(!ch.isAuthorizedChoiceState(choice)||ch.isAuthorizedChoiceState({headline:"O próximo passo é seu.",actions:["UNDERSTAND_PATHS"]}))throw Error("18 ChoiceState authority broken");
 let forgedInput=false;try{p.buildPathsView({intent,financing:{vehicleReferenceValue:100000,allocatedDownPayment:{pathId:"FINANCING",field:"allocatedDownPayment",value:20000},productTermMonths:term,rateReference:finAuth}})}catch(e){forgedInput=true}if(!forgedInput)throw Error("19 forged explicit input accepted");
-let crossPath=false;try{p.buildPathsView({intent,financing:{vehicleReferenceValue:100000,allocatedDownPayment:ib.recordExplicitPathInput("CONSORTIUM","allocatedDownPayment",20000),productTermMonths:term,rateReference:finAuth}})}catch(e){crossPath=true}if(!crossPath)throw Error("20 cross-path input accepted");
+let crossPath=false;try{p.buildPathsView({intent,financing:{vehicleReferenceValue:100000,allocatedDownPayment:ib.recordExplicitPathInput(intent,"CONSORTIUM","allocatedDownPayment",20000),productTermMonths:term,rateReference:finAuth}})}catch(e){crossPath=true}if(!crossPath)throw Error("20 cross-path input accepted");
+let fakeSession=false;try{ib.recordExplicitPathInput({action:"UNDERSTAND_PATHS"},"FINANCING","productTermMonths",48)}catch(e){fakeSession=String(e).includes("PATH_INPUT_SESSION_NOT_AUTHORIZED")}if(!fakeSession)throw Error("20b forged path-input session accepted");
 const forgedRef={value:fin};const badRef=p.buildPathsView({intent,financing:{vehicleReferenceValue:100000,allocatedDownPayment:down,productTermMonths:term,rateReference:forgedRef}});if(badRef.cards[1].publicationStatus!=="UNAVAILABLE")throw Error("21 forged reference accepted");
 let invalidRef=false;try{rs.authorizeValidatedVehiclePathReference({...fin,lineage:{...fin.lineage,source:"B3"}})}catch(e){invalidRef=true}if(!invalidRef)throw Error("22 invalid reference authorized");
 console.log("MWC-017J Paths mandatory boundary tests passed (22)");
