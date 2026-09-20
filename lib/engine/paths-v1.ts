@@ -5,7 +5,12 @@ import { isChoicePathsIntent, type ChoicePathsIntent } from "./choice-paths-boun
 
 export type PathId="ACCUMULATION"|"FINANCING"|"CONSORTIUM";
 export type PathStatus="AUTHORIZED"|"UNAVAILABLE"|"INPUT_REQUIRED";
-export type PathsEntryOrigin="CHOICE_UNDERSTAND_PATHS"|"EXPLICIT_NAMED_PATH_REQUEST";
+export type PathCardViewModel=Readonly<{
+ pathId:PathId;title:string;explanation:string;requiredInputs:readonly string[];
+ publicationStatus:PathStatus;publication:AuthorizedPublication|null;referenceContext:string;
+ disclosures:readonly string[];action:"INSPECT_OR_SIMULATE";expanded:false;
+}>;
+export type PathsViewModel=Readonly<{cards:readonly [PathCardViewModel,PathCardViewModel,PathCardViewModel];focusedPath:null}>;
 
 
 type Common={intent:ChoicePathsIntent};
