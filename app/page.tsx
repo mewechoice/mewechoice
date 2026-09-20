@@ -491,7 +491,7 @@ export default function Home() {
         <nav className="nav" aria-label="Navegação principal">
           <a href="#metodo">Nosso método</a>
           <a href="#processo">Como funciona</a>
-          <a href="#transparencia">Transparência</a>
+          <a href="#transparencia">Transparência</a>\n          <a href="/descobrir">Descobrir</a>
         </nav>
         <button className="header-consult" type="button" onClick={() => setFastTrack(true)}>Falar com um consultor →</button>
       </header>
