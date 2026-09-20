@@ -88,3 +88,47 @@ Required correction: DOM/focus order follows the same fixed taxonomy; no path is
 
 ## MWC-017B gate
 Specification is NOT implementation-eligible until all P1 findings are bound into the contract and re-audited.
+
+
+## MWC-017C — Binding corrections
+The following rules are normative for V1 and supersede any looser wording above.
+
+1. ENTRY AUTHORITY FIREWALL
+Paths accepts only a PathsEntryAuthority with origin CHOICE_UNDERSTAND_PATHS or EXPLICIT_NAMED_PATH_REQUEST. Authority is created at the user-action boundary and is not derivable from profile, resources, horizon, analytics, CRM or commercial state.
+
+2. SYMMETRIC CARD CONTRACT
+Every path maps to the same ordered PathCardViewModel slots: pathId, title, explanation, requiredInputs, publicationStatus, publication, referenceContext, disclosures, action. V1 has no featured, recommended, promoted, score, rank or commercialPriority field. An unavailable slot remains present with status UNAVAILABLE.
+
+3. AVAILABILITY NON-SELECTION
+AUTHORIZED/UNAVAILABLE affects only that path's status/content. It never changes taxonomy order, visual emphasis, CTA priority, default expansion or selection. No surviving-path logic exists.
+
+4. EXPLICIT INPUT PROVENANCE
+Path-dependent user variables use provenance USER_ENTERED. Financing allocatedDownPayment and productTermMonths, and consortium productTermMonths, must originate from explicit user entry after that path is opened. They cannot be copied, defaulted or suggested from projectHorizon, currentResources, partner terms or analytics. Official rates/fees use SYSTEM_REFERENCE provenance and are not user-editable.
+
+5. INTERACTION NEUTRALITY
+DOM order, keyboard focus order and visual order are identical to the fixed taxonomy: ACCUMULATION, FINANCING, CONSORTIUM. No path is expanded or focused by default. An explicit user action may expand only the requested path.
+
+6. NO CROSS-PATH DERIVED LANGUAGE
+The Paths layer may not derive prose from relative numerical outcomes across path cards. Existing publications remain independent objects.
+
+### Corrected mandatory tests
+In addition to the original 14 cases, implementation must prove:
+15. invalid/missing PathsEntryAuthority fails closed;
+16. authority cannot be constructed from profile/commercial state through the Paths API;
+17. all three cards expose identical ordered field-slot classes;
+18. UNAVAILABLE does not reorder, hide, elevate or auto-open another path;
+19. user-input provenance cannot be replaced by project/default/system values;
+20. SYSTEM_REFERENCE fields cannot be edited through path-input API;
+21. DOM/focus/view-model order is taxonomy order;
+22. no default expanded/focused path exists.
+
+## MWC-017D — Specification re-audit
+Result: PASS — P0=0; P1=0; P2=0 open at specification level.
+
+017B-01 CLOSED by typed entry authority.
+017B-02 CLOSED by deterministic symmetric PathCardViewModel.
+017B-03 CLOSED by availability non-selection.
+017B-04 CLOSED by explicit provenance firewall.
+017B-05 CLOSED by interaction-neutrality contract.
+
+Implementation is eligible to begin. Merge remains prohibited until implementation audit and Owner authorization.
