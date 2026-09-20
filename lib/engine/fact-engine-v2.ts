@@ -71,13 +71,18 @@ export type Fact = {
   createdAt: string;
 };
 
+const semanticUnits:Record<SemanticId,FactUnit>={
+  CURRENT_RESOURCES:"BRL",MONTHLY_CONTRIBUTION:"BRL",PROJECT_HORIZON:"MONTHS",ACCUMULATION_WITHOUT_YIELD:"BRL",ACCUMULATION_DI_REFERENCE_RATE:"PERCENT_PER_YEAR",ACCUMULATION_GROSS_DI_REFERENCE_PROJECTION:"BRL",
+  VEHICLE_REFERENCE_VALUE:"BRL",FINANCING_ALLOCATED_DOWN_PAYMENT:"BRL",FINANCING_PRINCIPAL:"BRL",FINANCING_PRODUCT_TERM:"MONTHS",FINANCING_AVERAGE_MONTHLY_RATE:"PERCENT_PER_MONTH",FINANCING_MATHEMATICAL_PRICE_INSTALLMENT:"BRL",FINANCING_INSTALLMENTS_TOTAL:"BRL",FINANCING_PROJECTED_OUTLAY:"BRL",FINANCING_MATHEMATICAL_INTEREST:"BRL",
+  CONSORTIUM_CREDIT_REFERENCE:"BRL",CONSORTIUM_STATISTICAL_ADMIN_FEE_RATE:"PERCENT_OF_CREDIT",CONSORTIUM_ADMINISTRATION_REFERENCE_AMOUNT:"BRL",CONSORTIUM_PRODUCT_TERM:"MONTHS",CONSORTIUM_BASE_SIMULATED_TOTAL:"BRL",CONSORTIUM_BASE_MATHEMATICAL_INSTALLMENT:"BRL"
+};
 const brl = (v:number) => new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(v);
 const pct = (v:number) => new Intl.NumberFormat("pt-BR",{maximumFractionDigits:2}).format(v)+"%";
 const baseState = { availability:"AVAILABLE", validation:"VALIDATED", freshness:"CURRENT", authorization:"AUTHORIZED", completeness:"COMPLETE" } as const;
 
 function fact(args: Omit<Fact,"createdAt">): Fact {
   if (!Number.isFinite(args.value.exactValue)) throw new RangeError("FACT_VALUE_NOT_FINITE");
-  if (!args.value.unit) throw new RangeError("FACT_UNIT_REQUIRED");
+  if (!args.value.unit) throw new RangeError("FACT_UNIT_REQUIRED");\n  if (semanticUnits[args.semanticId]!==args.value.unit) throw new RangeError("FACT_UNIT_MISMATCH");
   return {...args, createdAt:new Date().toISOString()};
 }
 function input(id:string, semanticId:SemanticId, exactValue:number, unit:FactUnit, displayValue:string):Fact {
