@@ -13,6 +13,8 @@ export type ScenarioInput=AccumulationScenarioInput|FinancingScenarioInput|Conso
 export type ScenarioRecord=Readonly<{scenarioId:string;baselineProjectId:string;route:ScenarioRoute;createdOrder:number;changedFields:readonly string[];input:Readonly<ScenarioInput>;status:ScenarioStatus;publication?:AuthorizedPublication;unavailableReason?:string}>;
 export type ChoiceAction="ADJUST_PLAN"|"VIEW_SCENARIO_DETAILS"|"UNDERSTAND_PATHS"|"SAVE_PROJECT"|"CONTACT_CONSULTANT";
 export type ChoiceState=Readonly<{headline:"O próximo passo é seu.";actions:readonly ChoiceAction[];primaryAction?:ChoiceAction}>;
+const CHOICE_STATES=new WeakSet<object>();
+export function isAuthorizedChoiceState(x:unknown):x is ChoiceState{return !!x&&typeof x==="object"&&CHOICE_STATES.has(x as object)}
 export type AccumulationScenarioEdit=Readonly<{scenarioId:string;createdOrder:number;currentResources?:number;monthlyContribution?:number;projectHorizonMonths?:number}>;
 export type FinancingScenarioEdit=Readonly<{scenarioId:string;createdOrder:number;vehicleReferenceValue?:number;allocatedDownPayment?:number;productTermMonths?:number}>;
 export type ConsortiumScenarioEdit=Readonly<{scenarioId:string;createdOrder:number;creditReference?:number;productTermMonths?:number}>;
@@ -48,5 +50,5 @@ export function canCompareFinancingScenarios(a:ScenarioRecord,b:ScenarioRecord):
 const actions:readonly ChoiceAction[]=Object.freeze(["ADJUST_PLAN","VIEW_SCENARIO_DETAILS","UNDERSTAND_PATHS","SAVE_PROJECT","CONTACT_CONSULTANT"]);
 export function buildChoiceState(intent?:"ADJUST"|"PATHS"|"CONTACT"):ChoiceState{
  const primary=intent==="ADJUST"?"ADJUST_PLAN":intent==="PATHS"?"UNDERSTAND_PATHS":intent==="CONTACT"?"CONTACT_CONSULTANT":undefined;
- return Object.freeze({headline:"O próximo passo é seu." as const,actions,primaryAction:primary});
+ const state=Object.freeze({headline:"O próximo passo é seu." as const,actions,primaryAction:primary});CHOICE_STATES.add(state);return state;
 }
