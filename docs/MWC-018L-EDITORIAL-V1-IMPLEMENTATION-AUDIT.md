@@ -40,3 +40,26 @@ Residual P2 = 2
 Do not represent Vercel's deployment-rate-limit failure as an application build failure. Conversely, do not claim typecheck/build/test execution passed without execution evidence.
 
 PR remains draft. Naming remains provisional. Merge remains Owner-gated.
+
+
+## MWC-018M — Execution Evidence Closure
+GitHub Actions run 10 on head d65117fca8278ea7072f26522a3a09038f7f19f6 established the editorial hard gates:
+- npm ci: PASS
+- TypeScript typecheck: PASS
+- editorial-v1 structural/adversarial test: PASS
+- production build: PASS
+
+The diagnostic legacy/API/external-source lanes still expose pre-existing issues under CI:
+- API integration expects Gemini but CI receives fallback_runtime;
+- BCB collector integration can return FETCH_FAILED where the test fixture expects INVALID_REFERENCE;
+- Vehicle Project arithmetic-boundary test disagrees with current schema semantics for an extreme safe-integer input.
+These are not caused by the editorial diff and were not silently changed in MWC-018.
+
+### Final implementation verdict
+PASS WITH PRE-EXISTING DIAGNOSTIC DEBT
+P0 = 0
+P1 = 0
+Editorial hard gates = PASS
+Production build = PASS
+
+Naming remains a hypothesis gate: DESCOBRIR and ANTES DA ESCOLHA are not frozen by this technical PASS.
