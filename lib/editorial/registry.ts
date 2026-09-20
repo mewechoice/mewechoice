@@ -1,4 +1,4 @@
-export const EDITORIAL_HYPOTHESES = Object.freeze({ navigationLabel: "Descobrir", masthead: "Antes da Escolha", landingPath: "/descobrir" });
+export const EDITORIAL_HYPOTHESES = Object.freeze({ navigationLabel: "Explore", masthead: "Antes da Escolha", landingPath: "/descobrir" });
 export type EditorialClaimClass = "EVERGREEN_EXPLANATION" | "CURRENT_REFERENCE" | "MODELED_EXAMPLE" | "PRODUCT_SPECIFIC" | "EDITORIAL_OPINION";
 export type EditorialArticle = Readonly<{ id:string; slug:string; topicId:string; headline:string; deck:string; publishedAt:string; readingTimeEstimate?:string; claimClasses:readonly EditorialClaimClass[]; sourceNotes?:readonly string[]; assumptions?:readonly string[]; relatedArticleIds:readonly string[]; sections:readonly Readonly<{heading:string; paragraphs:readonly string[]}>[] }>;
 export const EDITORIAL_ARTICLES: readonly EditorialArticle[] = Object.freeze([
