@@ -159,3 +159,25 @@ Required correction: expand direct tests or record exact test-to-existing-suite 
 
 ## MWC-017F gate
 Implementation is NOT merge-eligible. Correct P1 findings, expand evidence, then run MWC-017G re-audit.
+
+
+## MWC-017G — Corrected implementation re-audit
+Result: FAIL — P0=0; P1=2; P2=1.
+
+The literal-newline corruption is CLOSED on the canonical branch: the current source contains real line breaks and no literal \\n escape artifacts.
+
+### P1-017G-01 — authority minting remains self-asserted
+captureExplicitUserAction() is exported by the same Paths module and accepts only caller-provided arguments. authorizePathsEntryFromUserAction() therefore proves only that the caller previously invoked the public capture factory; it does not prove that CHOICE emitted the action.
+
+Required correction: CHOICE must mint an opaque ChoicePathsIntent from buildChoiceState/user-action handling, and Paths must consume that artifact. Paths must not expose the minting primitive.
+
+### P1-017G-02 — provenance minting remains self-asserted
+captureUserValue() and captureSystemReference() are exported from Paths and accept arbitrary values. WeakSet membership therefore authenticates the wrapper, not the provenance of its payload.
+
+Required correction: user-entered values must be minted by a dedicated input-boundary module/API whose operation semantically represents receipt of explicit user input; system references must be accepted only as already validated reference artifacts or minted by the reference boundary, not by Paths.
+
+### P2-017G-03 — external CI evidence unavailable
+Both Vercel statuses on the prior head report failure URLs pointing to build-rate-limit. This is infrastructure evidence, not a code failure, but it cannot establish successful build/test execution. No GitHub Actions workflow currently supplies independent CI evidence.
+
+## MWC-017G gate
+Implementation remains NOT merge-eligible. Next correction must move authority/provenance issuance out of Paths and bind it to the existing CHOICE and validated-reference/input boundaries. Re-audit after that correction.
