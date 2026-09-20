@@ -6,7 +6,7 @@ const base={scenarioId:"base",baselineProjectId:"p1",createdOrder:0,route:"FINAN
 const snapshot=JSON.stringify(base),b=s.createBaseline(base);if(!b.publication||b.status!=="AUTHORIZED")throw Error("01 baseline not authorized");
 const x=s.createUserScenario(base,{scenarioId:"s1",createdOrder:1,allocatedDownPayment:30000});if(JSON.stringify(base)!==snapshot)throw Error("02 baseline mutated");
 if(JSON.stringify(x.changedFields)!==JSON.stringify(["allocatedDownPayment"]))throw Error("03 changedFields not exact explicit edit");
-let blocked=false;try{s.createUserScenario(base,{scenarioId:"bad",createdOrder:2,route:"CONSORTIUM"})}catch(e){blocked=String(e).includes("ROUTE_CHANGE_NOT_ALLOWED")}if(!blocked)throw Error("04 route change accepted");
+let blocked=false;try{s.createBaseline({...base,createdOrder:1})}catch(e){blocked=String(e).includes("BASELINE_ORDER_MUST_BE_ZERO")}if(!blocked)throw Error("04 invalid baseline order accepted");
 const y=s.createUserScenario(base,{scenarioId:"s2",createdOrder:2,productTermMonths:60});if(s.canCompareFinancingScenarios(x,y))throw Error("05 unequal terms comparable");
 const z=s.createUserScenario(base,{scenarioId:"s3",createdOrder:3,allocatedDownPayment:10000});if(!s.canCompareFinancingScenarios(x,z))throw Error("06 equal terms blocked");
 const ordered=s.orderScenarios([z,b,x]);if(ordered.map(q=>q.scenarioId).join(",")!=="base,s1,s3")throw Error("07 creation order not preserved");
