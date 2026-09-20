@@ -109,3 +109,30 @@ No winner is declared by the audit. The most differentiated concepts for a decis
 
 ## MWC-018B gate
 A naming decision is now required before information architecture and visual/editorial implementation are frozen. No code implementation should select a section name implicitly.
+
+
+## Owner direction — "Antes da Escolha"
+Owner positively selected **Antes da Escolha** as the leading naming direction.
+
+Status: LEADING CANDIDATE / NOT YET MERGED.
+
+Interpretation:
+- names the moment before a decision rather than commanding the user to learn;
+- supports an editorial destination made of pleasurable, useful articles;
+- aligns structurally with CHOICE while preserving user agency;
+- can host content beyond consortium and vehicles.
+
+Next work before freeze:
+1. adversarial naming/semantic check;
+2. navigation and mobile-fit check;
+3. editorial masthead/subtitle system;
+4. article-title architecture;
+5. SEO/discoverability implications;
+6. boundary check against advice/recommendation language;
+7. final Owner approval before merge/implementation.
+
+Working masthead hypothesis:
+**Antes da Escolha**
+Information, stories and explanations that help people understand what matters before deciding.
+
+This subtitle is a working hypothesis, not approved copy.
