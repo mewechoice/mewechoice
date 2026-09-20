@@ -39,3 +39,16 @@ The authority object is intentionally closed with null values for selectedPath, 
 ## Non-goals
 
 Scenario Lab, path comparison, product data, partner data, recommendation, CRM/contact gating, contemplation prediction, financing selection, consortium selection, and investment recommendation are outside MWC-021.
+
+
+## Final adversarial re-audit — CI #32
+
+Audited implementation HEAD: `9c1f0605a36ef21061d048aff0897b9d34ee8b1d`.
+
+CI #32 completed SUCCESS. Hard gates passed: dependency install, TypeScript, editorial structural regression, Home production architecture, Vehicle Project UX/safety, Project Engine V1 contract, legacy regression step, production build, external BCB collector integration step, vehicle arithmetic-boundary step, and environment-dependent API integration step. The vehicle boundary discrepancy reporter was skipped because no discrepancy was present.
+
+The adversarial pass tested runtime bypass of TypeScript assumptions. Project Engine V1 now fails closed with `INVALID_PROJECT_ENGINE_SOURCE` when its source is null, structurally invalid, missing horizon/assumptions, or not the expected Vehicle Engine version.
+
+No path, product, partner, or recommendation authority was introduced.
+
+STATUS: READY FOR OWNER MERGE AUTHORIZATION. This documentation commit changes the PR HEAD; the exact resulting HEAD must receive CI SUCCESS before merge.
