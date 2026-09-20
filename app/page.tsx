@@ -490,7 +490,7 @@ export default function Home() {
         <a href="#top" className="logo-link"><BrandMark compact /></a>
         <nav className="nav" aria-label="Navegação principal">
           <a href="#top">Início</a>
-          <a href="#diagnostico">Meu Projeto</a>
+          <a href="/meu-projeto/veiculo">Meu Projeto</a>
           <a href="/descobrir">Explore</a>
           <a href="#metodo">Nosso método</a>
           <a href="#transparencia">Transparência</a>

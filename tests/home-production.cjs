@@ -1,7 +1,7 @@
 const fs=require("node:fs");const assert=require("node:assert");
 const p=fs.readFileSync("app/page.tsx","utf8");
 assert(p.includes('href="#top">Início</a>'));
-assert(p.includes('href="#diagnostico">Meu Projeto</a>'));
+assert(p.includes('href="/meu-projeto/veiculo">Meu Projeto</a>'));
 assert(p.includes('href="/descobrir">Explore</a>'));
 assert(p.includes("Começar Meu Projeto →"));
 assert(p.includes("PRIMEIRO O PROJETO."));

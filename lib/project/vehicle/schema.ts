@@ -4,9 +4,16 @@ export type VehicleValidationResult =
   | { ok: true; value: VehicleProjectInput }
   | { ok: false; error: string };
 
+// Keep arithmetic away from Number.MAX_SAFE_INTEGER so later cent-based
+// additions/subtractions retain deterministic integer precision. This is a
+// technical safety envelope, not a product/business limit.
+const MAX_SAFE_MONEY_CENTS = Math.floor(Number.MAX_SAFE_INTEGER / 2);
+
 function validMoney(value: unknown, nullable = false): boolean {
   if (nullable && value === null) return true;
-  return typeof value === "number" && Number.isSafeInteger(value * 100) && value >= 0;
+  if (typeof value !== "number" || value < 0) return false;
+  const cents = value * 100;
+  return Number.isSafeInteger(cents) && cents <= MAX_SAFE_MONEY_CENTS;
 }
 
 function validMonths(value: unknown): value is number {
