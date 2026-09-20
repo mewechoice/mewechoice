@@ -5,7 +5,12 @@ import { publishAccumulation, publishConsortium, publishFinancing } from "./publ
 export type PathId="ACCUMULATION"|"FINANCING"|"CONSORTIUM";
 export type PathStatus="AUTHORIZED"|"UNAVAILABLE"|"INPUT_REQUIRED";
 export type InputProvenance="USER_ENTERED"|"SYSTEM_REFERENCE";
-const USER_VALUES=new WeakSet<object>();\nconst SYSTEM_VALUES=new WeakSet<object>();\nexport type UserValue<T>=Readonly<{value:T;provenance:"USER_ENTERED"}>;\nexport type SystemValue<T>=Readonly<{value:T;provenance:"SYSTEM_REFERENCE"}>;\nexport function captureUserValue<T>(value:T):UserValue<T>{const x=Object.freeze({value,provenance:"USER_ENTERED" as const});USER_VALUES.add(x);return x}\nexport function captureSystemReference<T>(value:T):SystemValue<T>{const x=Object.freeze({value,provenance:"SYSTEM_REFERENCE" as const});SYSTEM_VALUES.add(x);return x}
+const USER_VALUES=new WeakSet<object>();
+const SYSTEM_VALUES=new WeakSet<object>();
+export type UserValue<T>=Readonly<{value:T;provenance:"USER_ENTERED"}>;
+export type SystemValue<T>=Readonly<{value:T;provenance:"SYSTEM_REFERENCE"}>;
+export function captureUserValue<T>(value:T):UserValue<T>{const x=Object.freeze({value,provenance:"USER_ENTERED" as const});USER_VALUES.add(x);return x}
+export function captureSystemReference<T>(value:T):SystemValue<T>{const x=Object.freeze({value,provenance:"SYSTEM_REFERENCE" as const});SYSTEM_VALUES.add(x);return x}
 export type PathsEntryOrigin="CHOICE_UNDERSTAND_PATHS"|"EXPLICIT_NAMED_PATH_REQUEST";
 const ENTRY_AUTHORITY=new WeakSet<object>();
 export type PathsEntryAuthority=Readonly<{origin:PathsEntryOrigin;requestedPath?:PathId}>;
@@ -18,7 +23,14 @@ export type PathCardViewModel=Readonly<{
 
 export type PathsViewModel=Readonly<{cards:readonly [PathCardViewModel,PathCardViewModel,PathCardViewModel];focusedPath:null}>;
 
-const USER_ACTIONS=new WeakSet<object>();\nexport type ExplicitUserAction=Readonly<{action:"UNDERSTAND_PATHS";requestedPath?:PathId}>;\nexport function captureExplicitUserAction(action:"UNDERSTAND_PATHS",requestedPath?:PathId):ExplicitUserAction{const x=Object.freeze({action,...(requestedPath?{requestedPath}: {})});USER_ACTIONS.add(x);return x}\nexport function authorizePathsEntryFromUserAction(action:ExplicitUserAction):PathsEntryAuthority{\n if(!USER_ACTIONS.has(action as object)||action.action!=="UNDERSTAND_PATHS")throw new Error("USER_ACTION_NOT_AUTHORIZED");\n const origin:PathsEntryOrigin=action.requestedPath?"EXPLICIT_NAMED_PATH_REQUEST":"CHOICE_UNDERSTAND_PATHS";\n const a=Object.freeze({origin,...(action.requestedPath?{requestedPath:action.requestedPath}: {})});ENTRY_AUTHORITY.add(a);return a;\n}
+const USER_ACTIONS=new WeakSet<object>();
+export type ExplicitUserAction=Readonly<{action:"UNDERSTAND_PATHS";requestedPath?:PathId}>;
+export function captureExplicitUserAction(action:"UNDERSTAND_PATHS",requestedPath?:PathId):ExplicitUserAction{const x=Object.freeze({action,...(requestedPath?{requestedPath}: {})});USER_ACTIONS.add(x);return x}
+export function authorizePathsEntryFromUserAction(action:ExplicitUserAction):PathsEntryAuthority{
+ if(!USER_ACTIONS.has(action as object)||action.action!=="UNDERSTAND_PATHS")throw new Error("USER_ACTION_NOT_AUTHORIZED");
+ const origin:PathsEntryOrigin=action.requestedPath?"EXPLICIT_NAMED_PATH_REQUEST":"CHOICE_UNDERSTAND_PATHS";
+ const a=Object.freeze({origin,...(action.requestedPath?{requestedPath:action.requestedPath}: {})});ENTRY_AUTHORITY.add(a);return a;
+}
 function requireAuthority(a:PathsEntryAuthority){if(!ENTRY_AUTHORITY.has(a as object))throw new Error("PATHS_ENTRY_NOT_AUTHORIZED")}
 
 type Common={authority:PathsEntryAuthority};
@@ -39,7 +51,8 @@ const required:Record<PathId,readonly string[]>={
  FINANCING:Object.freeze(["vehicleReferenceValue","allocatedDownPayment","productTermMonths"]),
  CONSORTIUM:Object.freeze(["creditReference","productTermMonths"])
 };
-function user<T>(x:UserValue<T>|undefined,name:string):T{if(!x||!USER_VALUES.has(x as object))throw new Error("USER_INPUT_REQUIRED:"+name);return x.value}\nfunction system<T>(x:SystemValue<T>|undefined,name:string):T{if(!x||!SYSTEM_VALUES.has(x as object))throw new Error("SYSTEM_REFERENCE_REQUIRED:"+name);return x.value}
+function user<T>(x:UserValue<T>|undefined,name:string):T{if(!x||!USER_VALUES.has(x as object))throw new Error("USER_INPUT_REQUIRED:"+name);return x.value}
+function system<T>(x:SystemValue<T>|undefined,name:string):T{if(!x||!SYSTEM_VALUES.has(x as object))throw new Error("SYSTEM_REFERENCE_REQUIRED:"+name);return x.value}
 function card(pathId:PathId,status:PathStatus,publication:AuthorizedPublication|undefined,referenceContext:string,disclosures:readonly string[]):PathCardViewModel{
  return Object.freeze({pathId,title:title[pathId],explanation:explanation[pathId],requiredInputs:required[pathId],publicationStatus:status,publication:publication??null,referenceContext,disclosures:Object.freeze([...disclosures]),action:"INSPECT_OR_SIMULATE" as const,expanded:false as const});
 }
