@@ -6,6 +6,12 @@ import type {
   VehiclePathReference,
 } from "./types";
 
+const VALIDATED_REFERENCES=new WeakSet<object>();
+export type ValidatedVehiclePathReference=Readonly<{value:VehiclePathReference}>;
+const VALIDATED_ARTIFACTS=new WeakSet<object>();
+export function authorizeValidatedVehiclePathReference(raw:unknown):ValidatedVehiclePathReference{const r=validateVehiclePathReference(raw);if(!r.ok)throw new Error(r.error);VALIDATED_REFERENCES.add(r.value as object);const a=Object.freeze({value:r.value});VALIDATED_ARTIFACTS.add(a);return a}
+export function readValidatedVehiclePathReference(a:ValidatedVehiclePathReference):VehiclePathReference{if(!VALIDATED_ARTIFACTS.has(a as object)||!VALIDATED_REFERENCES.has(a.value as object))throw new Error("REFERENCE_NOT_AUTHORIZED");return a.value}
+
 export type ReferenceValidationResult =
   | { ok: true; value: VehiclePathReference }
   | { ok: false; error: string };
