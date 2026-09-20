@@ -181,3 +181,29 @@ Both Vercel statuses on the prior head report failure URLs pointing to build-rat
 
 ## MWC-017G gate
 Implementation remains NOT merge-eligible. Next correction must move authority/provenance issuance out of Paths and bind it to the existing CHOICE and validated-reference/input boundaries. Re-audit after that correction.
+
+
+## MWC-017I — independent re-audit after authenticated CHOICE boundary
+Result: FAIL — P0=0; P1=2; P2=1.
+
+### Closed
+- Literal newline corruption: CLOSED.
+- Paths-local action minting: CLOSED. Paths consumes ChoicePathsIntent and rejects structurally forged intents.
+- Structurally forged ChoiceState: CLOSED by scenario-lab runtime registry.
+- Symmetric publication slot: CLOSED (publication is always present, null when absent).
+
+### P1-017I-01 — explicit user-input provenance was removed rather than enforced
+PathsInput now accepts raw numbers for allocatedDownPayment and productTermMonths. A caller can pass projectHorizonMonths/currentResources/default/partner-derived numbers directly. The runtime no longer has any evidence that these path-dependent values were explicitly entered by the user after the path opened.
+
+Required correction: introduce an upstream user-input boundary artifact with field identity and path identity, minted at the explicit path-input event boundary; Paths consumes only authenticated artifacts for path-dependent fields. Do not mint them inside Paths.
+
+### P1-017I-02 — official reference provenance is type-only
+PathsInput accepts plain DiRateReference / VehicleFinancingRateReference / ConsortiumAdminFeeReference objects. TypeScript shape is not runtime authority. A caller can construct an arbitrary object with source BCB/B3 and feed it to the publication pipeline.
+
+Required correction: consume validated reference artifacts from the reference-data validation boundary, with runtime authenticity, or add such a boundary upstream of Paths. Paths must not mint reference authority.
+
+### P2-017I-03 — no independent execution evidence
+package.json includes tests/paths-v1.cjs in npm test, but current GitHub evidence does not show that command executed successfully. Vercel statuses on head f0e466d... point to build-rate-limit. This is not evidence of a code defect, but it is not a PASS signal.
+
+## MWC-017I gate
+NOT merge-eligible. The remaining P1s are provenance-boundary issues, not Paths presentation/neutrality issues.
