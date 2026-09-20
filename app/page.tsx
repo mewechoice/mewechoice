@@ -489,7 +489,11 @@ export default function Home() {
       <header className="site-header shell">
         <a href="#top" className="logo-link"><BrandMark compact /></a>
         <nav className="nav" aria-label="Navegação principal">
-          <a href="#top">Início</a>\n          <a href="#diagnostico">Meu Projeto</a>\n          <a href="/descobrir">Explore</a>\n          <a href="#metodo">Nosso método</a>\n          <a href="#transparencia">Transparência</a>
+          <a href="#top">Início</a>
+          <a href="#diagnostico">Meu Projeto</a>
+          <a href="/descobrir">Explore</a>
+          <a href="#metodo">Nosso método</a>
+          <a href="#transparencia">Transparência</a>
         </nav>
         <button className="header-consult" type="button" onClick={() => setFastTrack(true)}>Falar com um consultor →</button>
       </header>
@@ -575,7 +579,9 @@ export default function Home() {
       <section id="diagnostico" className="diagnostic-section">
         <div className="shell diagnostic-card">
           <div>
-            <p className="eyebrow eyebrow--light">MEU PROJETO</p>\n            <h2>Comece pelo que você quer realizar.</h2>\n            <p>Organize objetivo, momento e prioridades primeiro. Seus dados de contato ficam para depois da leitura inicial.</p>
+            <p className="eyebrow eyebrow--light">MEU PROJETO</p>
+            <h2>Comece pelo que você quer realizar.</h2>
+            <p>Organize objetivo, momento e prioridades primeiro. Seus dados de contato ficam para depois da leitura inicial.</p>
           </div>
           <div className="diagnostic-actions">
             <button className="btn" type="button" onClick={() => setQuizOpen(true)}>Começar Meu Projeto →</button>
