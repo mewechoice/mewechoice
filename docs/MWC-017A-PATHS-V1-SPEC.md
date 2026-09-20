@@ -132,3 +132,30 @@ Result: PASS — P0=0; P1=0; P2=0 open at specification level.
 017B-05 CLOSED by interaction-neutrality contract.
 
 Implementation is eligible to begin. Merge remains prohibited until implementation audit and Owner authorization.
+
+
+## MWC-017F — Implementation adversarial audit
+Result: FAIL — P0=0; P1=3; P2=1.
+
+### P1-017F-01 — entry authority factory is publicly forgeable
+authorizePathsEntry is exported and accepts the origin enum directly. Any internal caller can mint CHOICE_UNDERSTAND_PATHS authority without presenting a CHOICE artifact or user-action evidence. The WeakSet prevents plain-object forgery but does not enforce the specified user-action boundary.
+
+Required correction: authority minting must consume an opaque/authorized CHOICE action artifact for CHOICE_UNDERSTAND_PATHS, or a separately opaque explicit named-path action artifact. The Paths module must not expose a string-to-authority minting API.
+
+### P1-017F-02 — provenance wrappers are caller-asserted strings
+UserValue and SystemValue trust a public provenance property. A caller can wrap projectHorizon/currentResources/default/partner data as USER_ENTERED, or arbitrary rate data as SYSTEM_REFERENCE. This does not prove provenance.
+
+Required correction: use opaque runtime authority sets/factories at the actual input/reference boundaries, or consume already-authorized upstream artifacts. Paths must verify membership/authority, not a string field.
+
+### P1-017F-03 — symmetric card shape fails for authorized cards
+PathCardViewModel declares publication optional and card() omits the publication key when absent. Authorized cards include publication; INPUT_REQUIRED/UNAVAILABLE cards do not. Therefore identical ordered field-slot classes are not guaranteed and test 05 only exercises the all-input-required state.
+
+Required correction: publication must be a present slot on every card, with AuthorizedPublication or null. Test symmetry across mixed AUTHORIZED/INPUT_REQUIRED/UNAVAILABLE states.
+
+### P2-017F-04 — mandatory matrix is under-evidenced
+The spec requires 22 adversarial cases. paths-v1.cjs has 10 direct cases and asserts the remainder are covered by lower validators without an explicit traceability matrix. Several 017C-specific cases (system-reference edit rejection, provenance forgery, mixed-state symmetry) are not actually demonstrated.
+
+Required correction: expand direct tests or record exact test-to-existing-suite mappings for every mandatory case. New Paths-boundary invariants require direct tests.
+
+## MWC-017F gate
+Implementation is NOT merge-eligible. Correct P1 findings, expand evidence, then run MWC-017G re-audit.
