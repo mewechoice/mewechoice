@@ -76,3 +76,34 @@ Partial scenario sets must identify unavailable scenarios without converting UNK
 
 ## Gate
 MWC-016A is specification only. Independent adversarial review is mandatory before implementation.
+
+
+## MWC-016B — Independent adversarial review
+Result: FAIL — correction required before implementation.
+
+### P1-016B-01 — neutral system-generated scenarios are underspecified
+The phrase “explicitly neutral system-generated sensitivity set authorized by a future audited policy” leaves future scenario-generation authority undefined. A default sensitivity generator can steer through variable choice, range, step size, anchoring, or omission even without recommendation text.
+
+Correction required: V1 MUST be USER-DIRECTED ONLY. Every non-baseline scenario must arise from an explicit user-edited field/value. System-generated alternative values, presets, “common scenarios”, optimized ranges, or suggested deltas are prohibited in V1.
+
+### P1-016B-02 — ordering and emphasis can create a non-textual recommendation
+The spec prohibits commercial ranking but does not define deterministic presentation order/symmetry. Sorting by outcome, lower payment, earlier horizon, commercial value, or any derived metric can create an implicit winner.
+
+Correction required: scenario order MUST be creation order (baseline first, then user-created scenarios) and MUST NOT depend on calculated outcomes, route, commercial metadata, or inferred suitability. Same-route scenario cards MUST use symmetric presentation fields and visual priority at the contract level; UI styling implementation remains a later audited layer.
+
+### P1-016B-03 — CHOICE action order can steer toward conversion
+The permitted CTA list includes human contact but does not define whether ordering/visual prominence is neutral. “Falar com um consultor” could become the primary/default action and convert CHOICE into commercial steering.
+
+Correction required: CHOICE MUST have no preselected/default action. The primary continuation is “Ajustar meu planejamento” or “Entender caminhos possíveis” according to the user's explicit current intent; human contact MUST be secondary and only become primary after explicit human-contact intent. No CTA ordering may be driven by partner/commercial value.
+
+### P1-016B-04 — comparison authority is too permissive for scenario semantics
+The current Claim Registry authorizes comparisons for financing projected outlay/installment when semantic IDs and completeness match, but its temporal rule is a static string (“SAME_PRODUCT_TERM”) and compatibility does not itself prove the two facts actually came from equal product terms. Scenario Lab could therefore compare facts from different financing terms under a claim whose contract says SAME_PRODUCT_TERM.
+
+Correction required: before buildComparisonClaim is permitted, Scenario Lab MUST independently prove equality of every comparison precondition required by the registry, including productTermMonths for current financing comparison rules, and preserve that proof in scenario comparison lineage. If equality cannot be proven from canonical scenario inputs, comparison is prohibited. This is an integration guard; it does not expand Claim Registry authority.
+
+### P2-016B-05 — failure representation needs explicit non-zero semantics
+The spec says unavailable scenarios must not become zero, but it does not define a display contract.
+
+Correction required: failed/unavailable scenario result carries status UNAVAILABLE with no numeric result payload; zero is allowed only when zero is a validated numeric result.
+
+Post-review gate: open P1=4 until corrections are incorporated and re-audited.
