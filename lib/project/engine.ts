@@ -27,6 +27,9 @@ export type ProjectEngineReading = {
 };
 
 export function buildProjectEngineReading(result: VehicleProjectResult): ProjectEngineReading {
+  if (!result || typeof result !== "object" || result.engineVersion !== "1.0.0" || !result.horizon || !Array.isArray(result.assumptions)) {
+    throw new Error("INVALID_PROJECT_ENGINE_SOURCE");
+  }
   return {
     engineVersion: PROJECT_ENGINE_VERSION,
     vertical: "VEHICLE",
