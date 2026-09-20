@@ -1,10 +1,11 @@
-import type { ChoiceState } from "./scenario-lab-v1";
+import { isAuthorizedChoiceState, type ChoiceState } from "./scenario-lab-v1";
 import type { PathId } from "./paths-v1";
 
 const CHOICE_INTENTS=new WeakSet<object>();
 export type ChoicePathsIntent=Readonly<{action:"UNDERSTAND_PATHS";requestedPath?:PathId}>;
 
 export function emitChoicePathsIntent(choice:ChoiceState,requestedPath?:PathId):ChoicePathsIntent{
+ if(!isAuthorizedChoiceState(choice))throw new Error("CHOICE_STATE_NOT_AUTHORIZED");
  if(!choice.actions.includes("UNDERSTAND_PATHS"))throw new Error("CHOICE_PATHS_ACTION_NOT_AVAILABLE");
  if(choice.primaryAction!==undefined&&choice.primaryAction!=="UNDERSTAND_PATHS")throw new Error("CHOICE_PATHS_NOT_SELECTED");
  const x=Object.freeze({action:"UNDERSTAND_PATHS" as const,...(requestedPath?{requestedPath}: {})});
