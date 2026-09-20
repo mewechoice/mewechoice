@@ -107,3 +107,34 @@ The spec says unavailable scenarios must not become zero, but it does not define
 Correction required: failed/unavailable scenario result carries status UNAVAILABLE with no numeric result payload; zero is allowed only when zero is a validated numeric result.
 
 Post-review gate: open P1=4 until corrections are incorporated and re-audited.
+
+
+## MWC-016C — Master specification correction
+The MWC-016B findings are incorporated as binding V1 rules:
+
+1. USER-DIRECTED ONLY — baseline plus scenarios created from explicit user edits. No generated alternatives, presets, optimized ranges, suggested values, “popular” values, or system-selected deltas.
+2. ORDER FIREWALL — baseline first; subsequent scenarios remain in immutable user creation order. No sort/reorder by outcome, route, payment, horizon, commercial metadata, engagement, or inferred suitability.
+3. PRESENTATION SYMMETRY — scenario cards in the same comparison/view expose the same classes of fields with equal contract-level priority. Missing/unavailable fields are represented as unavailable, never hidden to make another scenario appear stronger.
+4. CHOICE FIREWALL — no preselected/default action. Human contact is secondary unless the user has explicitly requested human contact. CTA ordering/priority cannot depend on partner or commercial value.
+5. COMPARISON PRECONDITION PROOF — before invoking buildComparisonClaim, Scenario Lab proves from canonical scenario inputs every registry-required equality. For current financing comparison rules, productTermMonths MUST be exactly equal. The comparison record stores the scenario IDs and the proven equal input fields. If proof is absent, comparison is prohibited.
+6. UNAVAILABLE ≠ ZERO — scenario status is AUTHORIZED or UNAVAILABLE. UNAVAILABLE carries a typed reason and no numeric publication/result payload. Numeric zero may appear only inside an AUTHORIZED publication when produced and validated by the canonical pipeline.
+7. BASELINE IMMUTABILITY — scenario creation copies canonical baseline inputs into a new scenario input record and applies only the user's explicit edits; it never mutates the baseline record.
+8. NO NARRATIVE AI — all V1 scenario labels/statuses/CHOICE actions are closed deterministic strings. Narrative AI remains outside scope.
+
+### Corrected mandatory tests
+In addition to the original red-team questions, implementation MUST prove:
+- no API for system-generated alternative values exists in V1;
+- creation order is preserved when calculated values would sort differently;
+- same-route cards expose symmetric field classes;
+- human-contact CTA is not promoted without explicit contact intent;
+- financing comparison with unequal productTermMonths is rejected before Claim Registry invocation;
+- financing comparison with equal productTermMonths may proceed only if Claim Registry independently authorizes it;
+- unavailable scenario has no numeric publication payload;
+- validated zero remains distinguishable from unavailable;
+- baseline object remains unchanged after scenario creation;
+- scenario changedFields exactly equals explicit user edits.
+
+## MWC-016D — Corrected-spec re-audit
+Result: PASS. P0=0; P1=0. P2=0 open at specification level.
+
+The four P1 findings from MWC-016B are closed by explicit user-directed scenario generation, deterministic creation-order presentation, CHOICE steering firewall, and canonical-input comparison-precondition proof. The P2 unavailable/zero ambiguity is also closed. Implementation is eligible, but remains prohibited from merge until implementation audit and Owner authorization.
