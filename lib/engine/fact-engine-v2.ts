@@ -109,9 +109,13 @@ export function buildFinancingFacts(d:{calculation:FinancingEvidence;referenceFr
   const down=input("fin.down","FINANCING_ALLOCATED_DOWN_PAYMENT",allocatedDownPayment,"BRL",brl(allocatedDownPayment));
   const term=input("fin.term","FINANCING_PRODUCT_TERM",productTermMonths,"MONTHS",String(productTermMonths));
   const rate=source("fin.rate","FINANCING_AVERAGE_MONTHLY_RATE",rateReference,d.referenceFreshness ?? "UNKNOWN",["AVERAGE_REFERENCE_NOT_USER_RATE","NOT_CET","NOT_AN_OFFER","NOT_A_QUOTE"]);
+  const principalFact=fact({id:"fin.principal",kind:"CALCULATED_FACT",semanticId:"FINANCING_PRINCIPAL",value:{exactValue:principal,displayValue:brl(principal),unit:"BRL"},provenance:{origin:"CALCULATED_FACT",sourceLineage:[],calculationLineage:["PV=vehicle-downPayment"],parentFactIds:[vehicle.id,down.id]},state:{...baseState},missingComponents:[],comparisonPolicy:"COMPARABLE_WITH_CONTEXT",requiredDisclosures:[],methodology:["PRICE_EDUCATIONAL_CONVENTION"]});
   const calc=(id:string,semanticId:SemanticId,v:number,formula:string,parents:string[])=>fact({id,kind:"CALCULATED_FACT",semanticId,value:{exactValue:v,displayValue:brl(v),unit:"BRL"},provenance:{origin:"CALCULATED_FACT",sourceLineage:[rateReference.lineage],calculationLineage:[formula],parentFactIds:parents},state:{...baseState,authorization:"AUTHORIZED_WITH_DISCLOSURE"},missingComponents:[],comparisonPolicy:"COMPARABLE_WITH_CONTEXT",requiredDisclosures:["AVERAGE_REFERENCE_NOT_USER_RATE","NOT_CET","NOT_AN_OFFER"],methodology:["PRICE_EDUCATIONAL_CONVENTION"]});
-  const p=[vehicle.id,down.id,term.id,rate.id];
-  return [vehicle,down,term,rate,calc("fin.principal","FINANCING_PRINCIPAL",principal,"PV=vehicle-downPayment",[vehicle.id,down.id]),calc("fin.payment","FINANCING_MATHEMATICAL_PRICE_INSTALLMENT",payment,"PRICE_PMT",p),calc("fin.installments","FINANCING_INSTALLMENTS_TOTAL",installmentsTotal,"PMT*n",p),calc("fin.outlay","FINANCING_PROJECTED_OUTLAY",projectedOutlay,"downPayment+PMT*n",p),calc("fin.interest","FINANCING_MATHEMATICAL_INTEREST",mathematicalInterest,"installmentsTotal-principal",p)];
+  const paymentFact=calc("fin.payment","FINANCING_MATHEMATICAL_PRICE_INSTALLMENT",payment,"PRICE_PMT",[principalFact.id,term.id,rate.id]);
+  const installmentsFact=calc("fin.installments","FINANCING_INSTALLMENTS_TOTAL",installmentsTotal,"PMT*n",[paymentFact.id,term.id]);
+  const outlayFact=calc("fin.outlay","FINANCING_PROJECTED_OUTLAY",projectedOutlay,"downPayment+installmentsTotal",[down.id,installmentsFact.id]);
+  const interestFact=calc("fin.interest","FINANCING_MATHEMATICAL_INTEREST",mathematicalInterest,"installmentsTotal-principal",[installmentsFact.id,principalFact.id]);
+  return [vehicle,down,term,rate,principalFact,paymentFact,installmentsFact,outlayFact,interestFact];
 }
 
 export function buildConsortiumFacts(d:{calculation:ConsortiumEvidence;referenceFreshness?:Freshness}):Fact[]{
