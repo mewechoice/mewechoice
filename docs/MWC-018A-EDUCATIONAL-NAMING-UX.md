@@ -200,3 +200,59 @@ P1 = 0
 P2 = 4 (editorial signaling, mobile density, prescriptive-copy drift, premature-decision framing)
 
 Recommended status: keep **Antes da Escolha** as leading candidate and submit the exact same business problem to a blind independent second team before Owner freeze.
+
+
+## MWC-018E — Discover navigation hypothesis
+
+Owner preference: **DESCOBRIR** is the current provisional favorite for the first-level navigation label. This is NOT a frozen naming decision.
+
+Proposed architecture under test:
+- Navigation label: **Descobrir**
+- Editorial property/masthead: **Antes da Escolha**
+- Article headline: concrete curiosity/value hook
+
+Semantic roles must remain distinct:
+- Descobrir = door / navigation invitation
+- Antes da Escolha = editorial identity
+- Headline = reason to read
+
+### Adversarial test of DESCOBRIR
+1. **Affordance ambiguity — P1 WATCH**
+   "Descobrir" invites a click but does not itself specify whether the destination contains articles, products, tools, or company discovery. Destination preview/context and landing-page first viewport must resolve this immediately.
+2. **Clickbait drift — P1 WATCH**
+   Editorial headlines must not turn the discovery promise into sensationalism, hidden-truth framing, or unsupported revelations.
+3. **Commercial discovery confusion — P1 WATCH**
+   The area must not become "discover products/partners". Product and partner merchandising cannot redefine the navigation label.
+4. **Mobile fit — PASS**
+   Short, legible and action-oriented.
+5. **Recurring-reader fit — PASS**
+   Does not expire after a purchase or decision; supports ongoing exploration.
+6. **Course/obligation risk — PASS**
+   Does not imply study, curriculum or mandatory preparation.
+7. **Product-taxonomy collision — PASS**
+   Unlike Caminhos/Cenários, it does not collide with current MWC product semantics.
+8. **Brand scalability — PASS**
+   Can expand beyond vehicle/consortium into future project and decision domains.
+9. **Editorial pleasure — PASS WITH EXECUTION DEPENDENCY**
+   The verb opens curiosity, but pleasure comes from article quality, visual presentation, headlines and curation.
+10. **User-agency boundary — PASS**
+    The verb does not inherently recommend or select a path.
+
+### Kill criteria
+DESCOBRIR should be rejected if real-user testing shows material expectation of:
+- product/service catalog;
+- simulator/tool discovery;
+- company/about content;
+- a mandatory product step;
+or if users fail to identify the destination as a reading/editorial area after first-page exposure.
+
+### Challenger rule
+Do not reopen broad synonym generation. A new candidate may replace DESCOBRIR only if it materially improves both:
+1. click curiosity; and
+2. destination comprehension,
+without introducing a product-taxonomy collision or course/obligation semantics.
+
+### Current status
+DESCOBRIR = LEADING NAVIGATION HYPOTHESIS.
+ANTES DA ESCOLHA = LEADING EDITORIAL-MASTHEAD HYPOTHESIS.
+Neither is frozen or approved for merge.
