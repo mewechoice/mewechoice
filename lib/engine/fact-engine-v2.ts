@@ -82,7 +82,8 @@ const baseState = { availability:"AVAILABLE", validation:"VALIDATED", freshness:
 
 function fact(args: Omit<Fact,"createdAt">): Fact {
   if (!Number.isFinite(args.value.exactValue)) throw new RangeError("FACT_VALUE_NOT_FINITE");
-  if (!args.value.unit) throw new RangeError("FACT_UNIT_REQUIRED");\n  if (semanticUnits[args.semanticId]!==args.value.unit) throw new RangeError("FACT_UNIT_MISMATCH");
+  if (!args.value.unit) throw new RangeError("FACT_UNIT_REQUIRED");
+  if (semanticUnits[args.semanticId]!==args.value.unit) throw new RangeError("FACT_UNIT_MISMATCH");
   return {...args, createdAt:new Date().toISOString()};
 }
 function input(id:string, semanticId:SemanticId, exactValue:number, unit:FactUnit, displayValue:string):Fact {
