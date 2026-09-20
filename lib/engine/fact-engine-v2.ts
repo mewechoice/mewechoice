@@ -15,6 +15,7 @@ export type SemanticId =
   | "MONTHLY_CONTRIBUTION"
   | "PROJECT_HORIZON"
   | "ACCUMULATION_WITHOUT_YIELD"
+  | "ACCUMULATION_DI_REFERENCE_RATE"
   | "ACCUMULATION_GROSS_DI_REFERENCE_PROJECTION"
   | "VEHICLE_REFERENCE_VALUE"
   | "FINANCING_ALLOCATED_DOWN_PAYMENT"
@@ -88,7 +89,7 @@ export function buildAccumulationFacts(inputData:{currentResources:number;monthl
   const parents=[input("acc.current","CURRENT_RESOURCES",inputData.currentResources,"BRL",brl(inputData.currentResources)),input("acc.monthly","MONTHLY_CONTRIBUTION",inputData.monthlyContribution,"BRL",brl(inputData.monthlyContribution)),input("acc.horizon","PROJECT_HORIZON",inputData.projectHorizonMonths,"MONTHS",String(inputData.projectHorizonMonths))];
   const noYield=fact({id:"acc.no-yield",kind:"CALCULATED_FACT",semanticId:"ACCUMULATION_WITHOUT_YIELD",value:{exactValue:inputData.withoutYield,displayValue:brl(inputData.withoutYield),unit:"BRL"},provenance:{origin:"CALCULATED_FACT",sourceLineage:[],calculationLineage:["FV=P0+A*N","contributionTiming=END_OF_PERIOD"],parentFactIds:parents.map(x=>x.id)},state:{...baseState},missingComponents:[],comparisonPolicy:"COMPARABLE_WITH_CONTEXT",requiredDisclosures:[],methodology:["CONTRIBUTION_TIMING_END_OF_PERIOD"]});
   if(inputData.withDiReference===null||!inputData.diReference)return [...parents,noYield];
-  const rate=source("acc.di-rate","ACCUMULATION_GROSS_DI_REFERENCE_PROJECTION" as SemanticId,inputData.diReference,"UNKNOWN",["GROSS_REFERENCE_PROJECTION","TAXES_NOT_MODELED","FEES_NOT_MODELED","FUTURE_RATE_NOT_GUARANTEED"]);
+  const rate=source("acc.di-rate","ACCUMULATION_DI_REFERENCE_RATE",inputData.diReference,"UNKNOWN",["GROSS_REFERENCE_PROJECTION","TAXES_NOT_MODELED","FEES_NOT_MODELED","FUTURE_RATE_NOT_GUARANTEED"]);
   const projection=fact({id:"acc.di-projection",kind:"CALCULATED_FACT",semanticId:"ACCUMULATION_GROSS_DI_REFERENCE_PROJECTION",value:{exactValue:inputData.withDiReference,displayValue:brl(inputData.withDiReference),unit:"BRL"},provenance:{origin:"CALCULATED_FACT",sourceLineage:[inputData.diReference.lineage],calculationLineage:["MONTHLY_EQUIVALENT_FROM_ANNUAL_DI","FV_END_OF_PERIOD_CONTRIBUTIONS"],parentFactIds:[...parents.map(x=>x.id),rate.id]},state:{...baseState,freshness:"UNKNOWN",authorization:"AUTHORIZED_WITH_DISCLOSURE"},missingComponents:[],comparisonPolicy:"COMPARABLE_WITH_CONTEXT",requiredDisclosures:["GROSS_REFERENCE_PROJECTION","TAXES_NOT_MODELED","FEES_NOT_MODELED","FUTURE_RATE_NOT_GUARANTEED"],methodology:["CONTRIBUTION_TIMING_END_OF_PERIOD","SPECIFIC_INVESTMENT_PRODUCT_NONE"]});
   return [...parents,rate,projection,noYield];
 }
