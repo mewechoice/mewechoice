@@ -39,8 +39,11 @@ PARTIAL state and missing components MUST survive unchanged.
 ## Deterministic realization
 For each selected fact, buildFactValueClaim(fact) is the only value-claim constructor. renderedValue MUST equal fact.value.displayValue; unit MUST equal fact.value.unit. Labels are selected from a closed route/semantic map, never free text.
 
+## Selection authorization
+The publication allowlist is closed per route and semanticId. Only facts explicitly listed by the route contract may be selected. A presentation policy may omit an allowed fact, but MUST NOT add an unlisted semanticId. Selection MUST preserve the exact Fact object produced by Fact Engine V2; no reconstructed substitute is accepted by the orchestrator.
+
 ## Disclosure binding
-Every RequiredDisclosure attached to a selected Fact/Claim MUST generate an explicit FACT-scoped DisclosureBinding covering that fact. The orchestrator does not remove, deduplicate across unrelated facts, or downgrade disclosures.
+Every RequiredDisclosure attached to a selected Fact/Claim MUST generate an explicit FACT-scoped DisclosureBinding covering that fact. The orchestrator does not remove, deduplicate across unrelated facts, or downgrade disclosures. In 015A, each realization is rendered as an atomic publication card whose disclosure bindings are carried in the same card payload; publication-level or cross-card disclosure substitution is prohibited. UI pixel-distance/proximity policy remains outside this no-UI mission and MUST be enforced by the future renderer before display.
 
 ## Comparison
 No automatic cross-path comparison in 015A. Comparison publication requires an explicit future comparison request and buildComparisonClaim; absence of a request means no comparative claim.
@@ -69,7 +72,18 @@ Pipeline returns {ok:false, stage, reason} for calculation/fact/claim/validation
 18. input/reference lineage remains reachable through Facts;
 19. route isolation: accumulation cannot consume financing/consortium reference kinds;
 20. route isolation: financing cannot consume DI/consortium reference kinds;
-21. route isolation: consortium cannot consume DI/financing reference kinds.
+21. route isolation: consortium cannot consume DI/financing reference kinds;
+22. route allowlist rejects an unlisted semanticId even if the Fact is otherwise valid;
+23. disclosure binding for one card cannot satisfy another card's required disclosure.
+
+## MWC-015B independent adversarial review
+Result: FAIL → CORRECTED IN SPEC.
+
+P1-015B-01 — selection authority was implicit. A valid but route-unlisted Fact could have been selected by an over-broad presentation policy. Corrected with a closed per-route semantic allowlist and exact Fact-object preservation.
+
+P1-015B-02 — disclosure binding defined semantic coverage but not integration-level card locality. Corrected by requiring atomic card-local bindings and prohibiting publication/cross-card substitution. Pixel-distance is explicitly deferred to the future UI renderer, where it can be tested meaningfully.
+
+Post-correction status: P0=0; open P1=0 at specification level. Mandatory adversarial matrix expanded from 21 to 23 cases.
 
 ## Gate
-015A is specification only. Next: independent adversarial review MWC-015B. Implementation is prohibited until 015B findings are synthesized/corrected and the final integration spec passes re-audit.
+015A is specification only. MWC-015B completed with two P1 findings corrected in-spec. Implementation is prohibited until 015B findings are synthesized/corrected and the final integration spec passes re-audit.
