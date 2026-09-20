@@ -87,7 +87,11 @@ function source(id:string, semanticId:SemanticId, ref:VehiclePathReference, fres
   return fact({id,kind:"SOURCE_FACT",semanticId,value:{exactValue:ref.value,displayValue:pct(ref.value),unit:ref.unit},provenance:{origin:"SOURCE_FACT",sourceLineage:[ref.lineage],calculationLineage:[],parentFactIds:[]},state:{...baseState,freshness,authorization:disclosures.length?"AUTHORIZED_WITH_DISCLOSURE":"AUTHORIZED"},missingComponents:[],comparisonPolicy:"NOT_DIRECTLY_COMPARABLE",requiredDisclosures:disclosures,methodology:[ref.lineage.methodology]});
 }
 
-export function buildAccumulationFacts(inputData:{calculation:AccumulationEvidence;referenceFreshness?:Freshness}):Fact[]{\n  assertCalculationEvidence(inputData.calculation);\n  const {withoutYield,withDiReference}=inputData.calculation.result;\n  const {currentResources,monthlyContribution,projectHorizonMonths}=inputData.calculation.input;\n  const diReference=inputData.calculation.reference;
+export function buildAccumulationFacts(inputData:{calculation:AccumulationEvidence;referenceFreshness?:Freshness}):Fact[]{
+  assertCalculationEvidence(inputData.calculation);
+  const {withoutYield,withDiReference}=inputData.calculation.result;
+  const {currentResources,monthlyContribution,projectHorizonMonths}=inputData.calculation.input;
+  const diReference=inputData.calculation.reference;
   const parents=[input("acc.current","CURRENT_RESOURCES",currentResources,"BRL",brl(currentResources)),input("acc.monthly","MONTHLY_CONTRIBUTION",monthlyContribution,"BRL",brl(monthlyContribution)),input("acc.horizon","PROJECT_HORIZON",projectHorizonMonths,"MONTHS",String(projectHorizonMonths))];
   const noYield=fact({id:"acc.no-yield",kind:"CALCULATED_FACT",semanticId:"ACCUMULATION_WITHOUT_YIELD",value:{exactValue:withoutYield,displayValue:brl(withoutYield),unit:"BRL"},provenance:{origin:"CALCULATED_FACT",sourceLineage:[],calculationLineage:["FV=P0+A*N","contributionTiming=END_OF_PERIOD"],parentFactIds:parents.map(x=>x.id)},state:{...baseState},missingComponents:[],comparisonPolicy:"COMPARABLE_WITH_CONTEXT",requiredDisclosures:[],methodology:["CONTRIBUTION_TIMING_END_OF_PERIOD"]});
   if(withDiReference===null||!diReference)return [...parents,noYield];
@@ -96,7 +100,11 @@ export function buildAccumulationFacts(inputData:{calculation:AccumulationEviden
   return [...parents,rate,projection,noYield];
 }
 
-export function buildFinancingFacts(d:{calculation:FinancingEvidence;referenceFreshness?:Freshness}):Fact[]{\n  assertCalculationEvidence(d.calculation);\n  const {principal,payment,installmentsTotal,projectedOutlay,mathematicalInterest}=d.calculation.result;\n  const {vehicleReferenceValue,allocatedDownPayment,productTermMonths}=d.calculation.input;\n  const rateReference=d.calculation.reference; if(!rateReference) throw new RangeError("REFERENCE_UNAVAILABLE");
+export function buildFinancingFacts(d:{calculation:FinancingEvidence;referenceFreshness?:Freshness}):Fact[]{
+  assertCalculationEvidence(d.calculation);
+  const {principal,payment,installmentsTotal,projectedOutlay,mathematicalInterest}=d.calculation.result;
+  const {vehicleReferenceValue,allocatedDownPayment,productTermMonths}=d.calculation.input;
+  const rateReference=d.calculation.reference; if(!rateReference) throw new RangeError("REFERENCE_UNAVAILABLE");
   const vehicle=input("fin.vehicle","VEHICLE_REFERENCE_VALUE",vehicleReferenceValue,"BRL",brl(vehicleReferenceValue));
   const down=input("fin.down","FINANCING_ALLOCATED_DOWN_PAYMENT",allocatedDownPayment,"BRL",brl(allocatedDownPayment));
   const term=input("fin.term","FINANCING_PRODUCT_TERM",productTermMonths,"MONTHS",String(productTermMonths));
@@ -106,18 +114,22 @@ export function buildFinancingFacts(d:{calculation:FinancingEvidence;referenceFr
   return [vehicle,down,term,rate,calc("fin.principal","FINANCING_PRINCIPAL",principal,"PV=vehicle-downPayment",[vehicle.id,down.id]),calc("fin.payment","FINANCING_MATHEMATICAL_PRICE_INSTALLMENT",payment,"PRICE_PMT",p),calc("fin.installments","FINANCING_INSTALLMENTS_TOTAL",installmentsTotal,"PMT*n",p),calc("fin.outlay","FINANCING_PROJECTED_OUTLAY",projectedOutlay,"downPayment+PMT*n",p),calc("fin.interest","FINANCING_MATHEMATICAL_INTEREST",mathematicalInterest,"installmentsTotal-principal",p)];
 }
 
-export function buildConsortiumFacts(d:{creditReference:number;productTermMonths:number;calculation:CalculationEvidence<{administrationReference:number;baseSimulatedTotal:number;baseMathematicalInstallment:number;productTermMonths:number}>;adminFeeReference:ConsortiumAdminFeeReference;referenceFreshness?:Freshness}):Fact[]{
+export function buildConsortiumFacts(d:{calculation:ConsortiumEvidence;referenceFreshness?:Freshness}):Fact[]{
   assertCalculationEvidence(d.calculation);
   const {administrationReference,baseSimulatedTotal,baseMathematicalInstallment}=d.calculation.result;
-  if(d.calculation.result.productTermMonths!==productTermMonths) throw new RangeError("CALCULATION_TERM_MISMATCH");
+  const {creditReference,productTermMonths}=d.calculation.input;
+  const adminFeeReference=d.calculation.reference;
+  if(!adminFeeReference) throw new RangeError("REFERENCE_UNAVAILABLE");
   const credit=input("con.credit","CONSORTIUM_CREDIT_REFERENCE",creditReference,"BRL",brl(creditReference));
   const term=input("con.term","CONSORTIUM_PRODUCT_TERM",productTermMonths,"MONTHS",String(productTermMonths));
   const rate=source("con.admin-rate","CONSORTIUM_STATISTICAL_ADMIN_FEE_RATE",adminFeeReference,d.referenceFreshness ?? "DATED",["STATISTICAL_REFERENCE","DATED_REFERENCE","NOT_AN_OFFER","NOT_A_QUOTE","CONTRACT_CONDITIONS_MAY_DIFFER","UNKNOWN_COSTS_NOT_ASSUMED"]);
   const missing:MissingComponent[]=[{id:"RESERVE_FUND",applicability:"IF_APPLICABLE"},{id:"INSURANCE",applicability:"IF_APPLICABLE"},{id:"FUTURE_ADJUSTMENTS",applicability:"IF_APPLICABLE"},{id:"OTHER_CONTRACTUAL_CONDITIONS",applicability:"IF_APPLICABLE"}];
-  const calc=(id:string,semanticId:SemanticId,v:number,formula:string,partial:boolean)=>fact({id,kind:"CALCULATED_FACT",semanticId,value:{exactValue:v,displayValue:brl(v),unit:"BRL"},provenance:{origin:"CALCULATED_FACT",sourceLineage:[adminFeeReference.lineage],calculationLineage:[formula],parentFactIds:[credit.id,rate.id,...(semanticId==="CONSORTIUM_BASE_MATHEMATICAL_INSTALLMENT"?[term.id]:[])]},state:{...baseState,freshness:d.referenceFreshness ?? "DATED",authorization:"AUTHORIZED_WITH_DISCLOSURE",completeness:partial?"PARTIAL":"COMPLETE"},missingComponents:partial?missing:[],comparisonPolicy:"COMPARABLE_WITH_CONTEXT",requiredDisclosures:["STATISTICAL_REFERENCE","DATED_REFERENCE","NOT_AN_OFFER","NOT_A_QUOTE","CONTRACT_CONDITIONS_MAY_DIFFER","UNKNOWN_COSTS_NOT_ASSUMED"],methodology:["STATISTICAL_REFERENCE_NOT_CONTRACTUAL_QUOTE"]});
-  return [credit,term,rate,calc("con.admin-amount","CONSORTIUM_ADMINISTRATION_REFERENCE_AMOUNT",administrationReference,"credit*adminRate",false),calc("con.base-total","CONSORTIUM_BASE_SIMULATED_TOTAL",baseSimulatedTotal,"credit+administrationReference",true),calc("con.base-installment","CONSORTIUM_BASE_MATHEMATICAL_INSTALLMENT",baseMathematicalInstallment,"baseSimulatedTotal/productTerm",true)];
+  const disclosures:RequiredDisclosure[]=["STATISTICAL_REFERENCE","DATED_REFERENCE","NOT_AN_OFFER","NOT_A_QUOTE","CONTRACT_CONDITIONS_MAY_DIFFER","UNKNOWN_COSTS_NOT_ASSUMED"];
+  const admin=fact({id:"con.admin-amount",kind:"CALCULATED_FACT",semanticId:"CONSORTIUM_ADMINISTRATION_REFERENCE_AMOUNT",value:{exactValue:administrationReference,displayValue:brl(administrationReference),unit:"BRL"},provenance:{origin:"CALCULATED_FACT",sourceLineage:[adminFeeReference.lineage],calculationLineage:["credit*adminRate"],parentFactIds:[credit.id,rate.id]},state:{...baseState,freshness:d.referenceFreshness ?? "DATED",authorization:"AUTHORIZED_WITH_DISCLOSURE"},missingComponents:[],comparisonPolicy:"COMPARABLE_WITH_CONTEXT",requiredDisclosures:disclosures,methodology:["STATISTICAL_REFERENCE_NOT_CONTRACTUAL_QUOTE"]});
+  const total=fact({id:"con.base-total",kind:"CALCULATED_FACT",semanticId:"CONSORTIUM_BASE_SIMULATED_TOTAL",value:{exactValue:baseSimulatedTotal,displayValue:brl(baseSimulatedTotal),unit:"BRL"},provenance:{origin:"CALCULATED_FACT",sourceLineage:[adminFeeReference.lineage],calculationLineage:["credit+administrationReference"],parentFactIds:[credit.id,admin.id]},state:{...baseState,freshness:d.referenceFreshness ?? "DATED",authorization:"AUTHORIZED_WITH_DISCLOSURE",completeness:"PARTIAL"},missingComponents:missing,comparisonPolicy:"COMPARABLE_WITH_CONTEXT",requiredDisclosures:disclosures,methodology:["STATISTICAL_REFERENCE_NOT_CONTRACTUAL_QUOTE"]});
+  const installment=fact({id:"con.base-installment",kind:"CALCULATED_FACT",semanticId:"CONSORTIUM_BASE_MATHEMATICAL_INSTALLMENT",value:{exactValue:baseMathematicalInstallment,displayValue:brl(baseMathematicalInstallment),unit:"BRL"},provenance:{origin:"CALCULATED_FACT",sourceLineage:[adminFeeReference.lineage],calculationLineage:["baseSimulatedTotal/productTerm"],parentFactIds:[total.id,term.id]},state:{...baseState,freshness:d.referenceFreshness ?? "DATED",authorization:"AUTHORIZED_WITH_DISCLOSURE",completeness:"PARTIAL"},missingComponents:missing,comparisonPolicy:"COMPARABLE_WITH_CONTEXT",requiredDisclosures:disclosures,methodology:["STATISTICAL_REFERENCE_NOT_CONTRACTUAL_QUOTE"]});
+  return [credit,term,rate,admin,total,installment];
 }
-
 export function canDirectlyCompare(a:Fact,b:Fact):boolean {
   return a.value.unit===b.value.unit && a.comparisonPolicy==="DIRECTLY_COMPARABLE" && b.comparisonPolicy==="DIRECTLY_COMPARABLE" && a.state.completeness==="COMPLETE" && b.state.completeness==="COMPLETE";
 }
