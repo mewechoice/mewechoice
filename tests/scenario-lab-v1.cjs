@@ -14,4 +14,9 @@ const fail=s.createUserScenario(base,{scenarioId:"fail",createdOrder:4,productTe
 const ch=s.buildChoiceState();if(ch.primaryAction!==undefined)throw Error("09 default action preselected");
 const contact=s.buildChoiceState("CONTACT");if(contact.primaryAction!=="CONTACT_CONSULTANT")throw Error("10 explicit contact intent not honored");
 if(ch.actions[0]!=="ADJUST_PLAN"||ch.actions[ch.actions.length-1]!=="CONTACT_CONSULTANT")throw Error("11 neutral CTA order changed");
-console.log("MWC-016 Scenario Lab runtime adversarial tests passed (11)");
+const proof=s.proveFinancingComparison(x,z);if(proof.productTermMonths!==48||proof.provenEqualFields[0]!=="productTermMonths")throw Error("12 comparison proof missing");
+let dup=false;try{s.orderScenarios([b,x,{...z,createdOrder:1}])}catch(e){dup=String(e).includes("DUPLICATE_SCENARIO_ORDER")}if(!dup)throw Error("13 duplicate order accepted");
+let dupId=false;try{s.orderScenarios([b,x,{...z,scenarioId:"s1"}])}catch(e){dupId=String(e).includes("DUPLICATE_SCENARIO_ID")}if(!dupId)throw Error("14 duplicate id accepted");
+if(!Object.isFrozen(x.input)||!Object.isFrozen(x.input.rateReference)||!Object.isFrozen(x.input.rateReference.lineage))throw Error("15 nested input not frozen");
+let badOrder=false;try{s.createUserScenario(base,{scenarioId:"neg",createdOrder:-1})}catch(e){badOrder=String(e).includes("INVALID_SCENARIO_ORDER")}if(!badOrder)throw Error("16 negative order accepted");
+console.log("MWC-016 Scenario Lab runtime adversarial tests passed (16)");
