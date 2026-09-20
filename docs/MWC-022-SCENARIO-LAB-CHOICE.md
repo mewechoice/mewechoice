@@ -19,3 +19,14 @@ Fail-closed invariants:
 - No commercial partner is selected.
 
 Canonical message: “O próximo passo é seu.”
+
+
+## Final adversarial re-audit — CI #35
+
+Audited implementation HEAD: `dea143ec37c07c140af60473c71e0484aed22921`.
+
+CI #35 completed SUCCESS after the expanded adversarial boundary suite. The validated contract rejects null or version-invalid Scenario/CHOICE sources, upstream authority contamination, preselected paths, injected recommendations, and a false claim that paths were already requested.
+
+Scenario Lab remains observational. CHOICE remains an explicit user-control boundary. No path enumeration or click behavior is implemented here, so MWC-022 cannot silently enter the later Caminhos layer.
+
+STATUS: READY FOR MERGE under the Owner's standing authorization for MWC-022. This documentation commit changes HEAD and therefore requires exact-HEAD CI success before merge.
