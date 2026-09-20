@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { calculateVehicleProject } from "../../lib/project/vehicle/engine";
+import { calculateVehicleProject } from "../../../lib/project/vehicle/engine";
 
 type Horizon = "IMMEDIATE" | "12" | "24" | "36" | "48" | "60" | "OTHER";
 
