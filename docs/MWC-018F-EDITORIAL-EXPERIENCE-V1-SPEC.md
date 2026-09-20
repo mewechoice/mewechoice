@@ -195,3 +195,83 @@ P1 = 6
 P2 = 5
 
 The architecture is viable, but implementation should not begin until the six P1 controls are made binding and re-audited.
+
+
+---
+
+# MWC-018H — Binding Corrections After Red-Team
+
+These controls are normative for V1 and close MWC-018G P1 findings.
+
+## C1 — Editorial → Product State Firewall
+An editorial surface may expose a neutral user-invoked link/action to Meu Projeto.
+On transition:
+- no articleId, topic, reading history, dwell time, editorial CTA context, inferred intent, path, product, partner or article-derived numerical value may populate, select, prioritize or alter product state;
+- product inputs must originate from the existing authorized product input boundaries;
+- editorial context may be retained only for aggregate/attribution analytics that cannot influence product decisions or presentation.
+
+## C2 — Deterministic Related Reading V1
+V1 related-reading selection is limited to deterministic editorial relationships: explicit topic/tag/manual article relations.
+Forbidden inputs include financial/project profile, CRM state, product state, partner economics, lead value, inferred suitability, engagement score, conversion probability or behavioral profiling.
+No personalized financial-content recommender in V1.
+
+## C3 — Advertising OFF in V1
+V1 contains:
+- no ads;
+- no sponsored placement;
+- no affiliate ranking;
+- no paid editorial priority;
+- no native-ad simulation.
+Any monetization requires a separate Owner-approved mission and audit before implementation.
+
+## C4 — Article Claim Governance
+Claims are classified:
+- EVERGREEN_EXPLANATION: conceptual explanation; must remain supportable and not be framed as time-sensitive fact.
+- CURRENT_REFERENCE: rate/statistic/current factual value; requires authoritative source, reference period/as-of date, retrieval/publication metadata as applicable.
+- MODELED_EXAMPLE: illustrative calculation; must be explicitly labeled example/simulation and disclose material assumptions.
+- PRODUCT_SPECIFIC: actual product/partner condition; requires authoritative product source, date/context, and cannot be generalized to the market.
+- EDITORIAL_OPINION: must be clearly distinguishable from factual assertion and may not become suitability advice.
+
+Unknown/stale values may not be silently represented as current or zero.
+
+## C5 — Metrics Are Observational
+V1 engagement metrics are observational only.
+They may not automatically:
+- rank/suppress articles;
+- rewrite/test headlines;
+- reorder topics;
+- change product state;
+- select a path;
+- alter financial presentation;
+- generate suitability or lead scores.
+Any optimization system requires a separately approved experiment specification.
+
+## C6 — No Journey-Prerequisite Semantics
+The editorial area may not be represented as a required step before Meu Projeto or CHOICE.
+Forbidden:
+- step numbering that sequences editorial before product;
+- progress bars linking reading completion to product access;
+- completion requirements;
+- locked product capability pending reading;
+- copy implying the user must read before proceeding.
+
+"Antes da Escolha" is an editorial identity hypothesis, not a workflow state.
+
+## P2 hardening incorporated
+- reading time, if used, is explicitly an estimate;
+- editorial author/reviewer roles must identify actual responsibility; do not invent reviewer authority;
+- editorial topic IDs remain distinct from product/path taxonomy IDs;
+- direct-entry article pages must identify MWC and the editorial context without Home-page dependency;
+- implementation must include semantic heading structure, keyboard operability, alt text for meaningful imagery, readable contrast and reduced-motion respect.
+
+## Re-audit acceptance tests
+1. Consortium article → Meu Projeto starts with no consortium selection/inference.
+2. Repeated financing reading cannot alter product logic or presentation.
+3. Article relation cannot consume financial/CRM/product/commercial/behavioral scoring.
+4. V1 cannot render sponsored/affiliate/paid-priority content.
+5. Current references cannot publish without dated authoritative provenance.
+6. Modeled examples are visibly examples with assumptions.
+7. Engagement metrics cannot rank or mutate editorial/product state.
+8. No UI sequence makes editorial reading prerequisite to product.
+9. Editorial topic IDs cannot be substituted for product path IDs.
+10. Direct article entry remains intelligible and accessible.
