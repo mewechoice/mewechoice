@@ -275,3 +275,30 @@ Forbidden:
 8. No UI sequence makes editorial reading prerequisite to product.
 9. Editorial topic IDs cannot be substituted for product path IDs.
 10. Direct article entry remains intelligible and accessible.
+
+
+---
+
+# MWC-018I — Narrow Re-audit
+
+Scope: verify closure of MWC-018G P1 findings without reopening naming preference.
+
+- P1-01 editorial/product authority: CLOSED by C1.
+- P1-02 related-reading profiling: CLOSED by C2.
+- P1-03 advertising ambiguity: CLOSED by C3.
+- P1-04 factual governance: CLOSED by C4.
+- P1-05 metric optimization pressure: CLOSED by C5.
+- P1-06 mandatory-stage illusion: CLOSED by C6.
+- P2 hardening requirements: incorporated as binding implementation constraints.
+
+## Verdict
+**PASS**
+P0 = 0
+P1 = 0
+
+Residual design hypotheses remain intentionally unresolved:
+- DESCOBRIR is not yet frozen as navigation label.
+- ANTES DA ESCOLHA is not yet frozen as editorial masthead.
+They may be implemented only as explicitly marked experiment/hypothesis values until Owner naming freeze.
+
+The corrected Editorial Experience V1 specification is fit to proceed to implementation planning. Merge remains an Owner gate.
