@@ -136,3 +136,67 @@ Working masthead hypothesis:
 Information, stories and explanations that help people understand what matters before deciding.
 
 This subtitle is a working hypothesis, not approved copy.
+
+
+## MWC-018C — ChatGPT independent red-team: "Antes da Escolha"
+
+### Scope
+Adversarial evaluation of the leading name only. This section must remain separate from any second-team/Gemini assessment to avoid cross-contamination.
+
+### Findings
+
+**RT-01 — Semantic fit: PASS**
+"Antes da Escolha" names a decision-preparation moment, not a product, financial category or learning obligation. It naturally preserves the user's final agency.
+
+**RT-02 — Brand architecture: PASS**
+The expression has a meaningful relationship with CHOICE without requiring the visitor to understand the ME/WE/CHOICE framework first. It can therefore work independently and gain additional meaning inside the brand system.
+
+**RT-03 — Editoriality: PASS WITH WATCH**
+It can credibly function as an editorial masthead and supports narrative/explainer articles. Risk: without an editorial subtitle, article cards or visual cues, the phrase alone may be interpreted as a process step rather than a content publication.
+
+**RT-04 — Click desire: PASS WITH WATCH**
+The phrase creates anticipatory tension ("before which choice?") and is less effort-coded than "Aprender". However, the umbrella label alone should not be expected to generate article CTR. Headlines, decks, imagery and contextual CTAs must carry concrete curiosity.
+
+**RT-05 — Navigation comprehension: PASS WITH WATCH**
+Readable and short enough for normal desktop navigation. On constrained mobile navigation it is longer than one-word labels but remains intelligible. Do not abbreviate it to "Escolha", because that changes the semantics.
+
+**RT-06 — Scope scalability: PASS**
+Not bound to vehicle, consortium, finance or acquisition. It can host future editorial material about projects, planning, acquisitions, partners, services and other decision contexts.
+
+**RT-07 — Commercial neutrality: PASS**
+The name itself does not imply a preferred solution, ranking, partner or sales outcome.
+
+**RT-08 — Advice/suitability boundary: PASS WITH GUARDRAIL**
+"Antes da Escolha" can tempt copywriters to write prescriptive material ("o melhor para você", "qual escolher"). Editorial policy must keep the distinction between explaining decision variables and choosing for the reader.
+
+**RT-09 — SEO/discovery: PASS WITH ARCHITECTURAL CONDITION**
+The brand label is not itself a search-query strategy. Organic discovery should be driven by article URLs, titles, headings, structured metadata and topic clusters. Do not distort the masthead merely to stuff financial keywords.
+
+**RT-10 — Linguistic risk: LOW**
+"Escolha" is broad and positive, but abstract. The masthead requires a concise descriptor on first exposure so the user immediately knows it is an editorial/article destination.
+
+**RT-11 — Repetition with CHOICE: ACCEPTABLE**
+The semantic echo is intentional rather than redundant if "Antes da Escolha" is the understanding/editorial layer and CHOICE remains the explicit user-decision state.
+
+**RT-12 — Premature-decision framing: WATCH**
+Not every reader arrives with an imminent decision. The editorial system must also welcome exploratory readers. Article language should avoid implying urgency or that a decision must be made now.
+
+### Adversarial attempts
+The name was tested against these hostile readings:
+- disguised consortium sales funnel;
+- course/training area;
+- financial-advice/recommendation section;
+- generic corporate blog;
+- mandatory step before CHOICE;
+- urgency/pressure to decide;
+- vehicle-only publication.
+
+No naming-level P0/P1 defect was found. Most risks are implementation/editorial-policy risks rather than defects in the name.
+
+### ChatGPT independent verdict
+**PASS WITH GUARDRAILS**
+P0 = 0
+P1 = 0
+P2 = 4 (editorial signaling, mobile density, prescriptive-copy drift, premature-decision framing)
+
+Recommended status: keep **Antes da Escolha** as leading candidate and submit the exact same business problem to a blind independent second team before Owner freeze.
