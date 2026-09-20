@@ -27,3 +27,16 @@ No Scenario Lab, product comparison, partner selection, CRM gate, contemplation 
 
 ## Merge gate
 CI and re-audit may proceed autonomously. Merge remains Owner-gated.
+
+
+## Final re-audit — CI #28
+
+Exact audited HEAD before this documentation commit: `ee32da311582d3f07785672bac21b2473365d618`.
+
+CI run #28 completed SUCCESS. Hard gates passed: dependency install, TypeScript, editorial structural regression, Home production architecture, Vehicle Project UX and safety, legacy regression, production build, external BCB collector integration, vehicle arithmetic-boundary test, and environment-dependent API integration.
+
+Final manual audit also closed blank/malformed monetary-input handling: empty input no longer becomes zero, Brazilian thousands/decimal forms are parsed explicitly, and ambiguous malformed forms are rejected.
+
+No product/path/partner recommendation was introduced. No contact gate was introduced. `IMMEDIATE` remains semantically distinct from zero months. The monetary safety envelope is technical arithmetic headroom only, not a commercial product cap.
+
+STATUS: READY FOR OWNER MERGE AUTHORIZATION. Any commit after this re-audit requires CI on the new exact HEAD before merge.
