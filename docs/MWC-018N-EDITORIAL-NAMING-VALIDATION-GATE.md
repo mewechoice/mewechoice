@@ -84,3 +84,25 @@ Names may be frozen independently.
 IMPLEMENTATION READY FOR HUMAN EXPERIENCE VALIDATION.
 No technical blocker in MWC-018 itself.
 Naming freeze and merge remain Owner decisions.
+
+
+## MWC-018O — Owner Naming Decision
+Date: 2026-09-20
+
+OWNER DECISION: EXPLORE CONFIRMED for the global editorial navigation label.
+
+Binding navigation label:
+INÍCIO | MEU PROJETO | EXPLORE
+
+Rationale carried into implementation:
+- invitation rather than course/help-center classification;
+- preserves user agency;
+- short navigation fit;
+- avoids collision with Caminhos product taxonomy;
+- supports editorial expansion beyond the initial vehicle/finance subjects.
+
+ANTES DA ESCOLHA remains the publication/masthead hypothesis and is not converted into a workflow step.
+
+The internal route /descobrir remains an implementation path for now; the visible navigation label is EXPLORE. A route rename is not required merely to freeze user-facing naming and should be handled separately if desired to avoid unnecessary URL churn.
+
+MERGE STATUS: NOT AUTHORIZED BY THIS NAMING DECISION.
