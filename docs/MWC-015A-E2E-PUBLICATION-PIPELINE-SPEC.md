@@ -85,5 +85,8 @@ P1-015B-02 — disclosure binding defined semantic coverage but not integration-
 
 Post-correction status: P0=0; open P1=0 at specification level. Mandatory adversarial matrix expanded from 21 to 23 cases.
 
+## MWC-015C final specification re-audit
+Result: PASS. P0=0; P1=0. The corrected contract is implementation-eligible. Re-audit verified the closed route allowlist, exact Fact-object preservation, atomic card-local disclosure binding, no automatic comparison, fail-closed publication behavior, and the prohibition on Narrative AI/recommendation authority. The 23-case adversarial matrix is mandatory for implementation audit.
+
 ## Gate
 015A is specification only. MWC-015B completed with two P1 findings corrected in-spec. Implementation is prohibited until 015B findings are synthesized/corrected and the final integration spec passes re-audit.
