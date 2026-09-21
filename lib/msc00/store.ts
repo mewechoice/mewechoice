@@ -1,9 +1,19 @@
+import { Redis } from "@upstash/redis";
 import type { Session } from "./model";
-const sessions = new Map<string, Session>();
+
+const redis = Redis.fromEnv();
+const PREFIX = "mwc:msc00:synthetic:session:";
+const TTL_SECONDS = 60 * 60 * 24;
+
 export const store = {
-  get(id:string){ return sessions.get(id) ?? null; },
-  set(s:Session){ sessions.set(s.sessionId,s); return s; }
+  async get(id: string): Promise<Session | null> {
+    return (await redis.get<Session>(PREFIX + id)) ?? null;
+  },
+  async set(s: Session): Promise<Session> {
+    await redis.set(PREFIX + s.sessionId, s, { ex: TTL_SECONDS });
+    return s;
+  }
 };
-// SYNTHETIC/PREVIEW ONLY. In-memory state is intentionally not production-authoritative
-// on serverless runtimes. REAL_MSC00_CONTENT_LOAD remains prohibited until durable
-// server-side persistence is selected and runtime-verified.
+
+// SYNTHETIC/PREVIEW ONLY. Durable persistence is isolated under a synthetic
+// namespace with a 24h TTL. REAL_MSC00_CONTENT_LOAD remains prohibited.
