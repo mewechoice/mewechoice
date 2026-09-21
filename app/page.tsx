@@ -494,7 +494,7 @@ export default function Home() {
           <a href="/descobrir">Explore</a>
           <a href="#metodo">Nosso Método</a>
         </nav>
-        <button className="header-consult" type="button" onClick={() => setFastTrack(true)}>Falar com um consultor →</button>
+        <button className="header-consult header-project" type="button" onClick={() => setQuizOpen(true)}>Começar Meu Projeto →</button>
       </header>
 
       <section id="top" className="hero shell">
