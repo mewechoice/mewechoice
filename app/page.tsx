@@ -492,8 +492,7 @@ export default function Home() {
           <a href="#top">Início</a>
           <a href="/meu-projeto/veiculo">Meu Projeto</a>
           <a href="/descobrir">Explore</a>
-          <a href="#metodo">Nosso método</a>
-          <a href="#transparencia">Transparência</a>
+          <a href="#metodo">Nosso Método</a>
         </nav>
         <button className="header-consult" type="button" onClick={() => setFastTrack(true)}>Falar com um consultor →</button>
       </header>
@@ -592,7 +591,7 @@ export default function Home() {
 
       <footer className="footer shell">
         <div><BrandMark compact /><p>Primeiro o projeto. Depois, a solução.</p></div>
-        <nav><a href="https://instagram.com/mewechoice" target="_blank" rel="noreferrer">Instagram</a><button type="button" onClick={() => setFastTrack(true)}>Contato</button><a href="#privacidade">Privacidade</a></nav>
+        <nav><a href="#transparencia">Transparência</a><a href="https://instagram.com/mewechoice" target="_blank" rel="noreferrer">Instagram</a><button type="button" onClick={() => setFastTrack(true)}>Contato</button><a href="#privacidade">Privacidade</a></nav>
         <p className="footer-right">Planejamento para escolhas que fazem sentido.<br />© 2026 ME WE CHOICE</p>
       </footer>
       <div id="privacidade" className="privacy-strip"><div className="shell"><strong>Privacidade:</strong> esta V3.5 é um protótipo de pré-lançamento. O diagnóstico salva dados apenas no navegador para teste; CRM, e-mail e canais oficiais serão conectados antes do lançamento comercial.</div></div>
