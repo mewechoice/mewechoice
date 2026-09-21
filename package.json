@@ -11,6 +11,7 @@
     "test:msc00": "node tests/msc00-web-static.cjs"
   },
   "dependencies": {
+    "@upstash/redis": "^1.35.3",
     "next": "^15.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
