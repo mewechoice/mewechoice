@@ -24,7 +24,7 @@ export async function GET(req:NextRequest){
   if(!auth(req)) return reply({error:"UNAUTHORIZED"},401);
   const id=req.nextUrl.searchParams.get("sessionId");
   if(!id) return reply({error:"SESSION_REQUIRED"},400);
-  const s=store.get(id); if(!s) return reply({error:"SESSION_NOT_FOUND"},404);
+  const s=await store.get(id); if(!s) return reply({error:"SESSION_NOT_FOUND"},404);
   return reply(safe(s));
 }
 
@@ -37,9 +37,9 @@ export async function POST(req:NextRequest){
     const s:Session={sessionId:randomUUID(),assessmentId:"MSC00-SYNTHETIC-WEB",assessmentVersion:"SYN-1",
       assessmentMode:"OWNER_VOLUNTARY_BLIND",blockId:"SYN",state:"BLOCK_READY",resourceAcknowledged:false,
       unitIndex:0,draft:"",finalized:null,confidence:null,evidence:[],contamination:null,pausedAt:null};
-    store.set(s); return reply(safe(s),201);
+    await store.set(s); return reply(safe(s),201);
   }
-  const s=store.get(String(b.sessionId||"")); if(!s) return reply({error:"SESSION_NOT_FOUND"},404);
+  const s=await store.get(String(b.sessionId||"")); if(!s) return reply({error:"SESSION_NOT_FOUND"},404);
 
   switch(b.action){
     case "ACK_RESOURCES":
@@ -72,5 +72,5 @@ export async function POST(req:NextRequest){
       s.state=s.evidence.length>s.unitIndex?"LOCKED":(s.draft?"RESPONSE_DRAFT":"UNIT_PRESENTED"); break;
     default: return reply({error:"UNKNOWN_ACTION"},400);
   }
-  store.set(s); return reply(safe(s));
+  await store.set(s); return reply(safe(s));
 }
