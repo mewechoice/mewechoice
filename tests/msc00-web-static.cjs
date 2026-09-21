@@ -1,0 +1,17 @@
+const fs=require("fs"),assert=require("assert");
+const route=fs.readFileSync("app/api/msc00/route.ts","utf8");
+const page=fs.readFileSync("app/msc00/page.tsx","utf8");
+const content=fs.readFileSync("lib/msc00/synthetic-content.ts","utf8");
+assert(route.includes("x-msc00-token"));
+assert(route.includes("Cache-Control"));
+assert(route.includes("ILLEGAL_TRANSITION"));
+assert(route.includes("CONFIDENCE_REQUIRED"));
+assert(route.includes("UNIT_NOT_RELEASABLE"));
+assert(route.includes('case "PAUSE"'));
+assert(route.includes('case "RESUME"'));
+assert(route.includes("timingSafeEqual"));
+assert(page.includes("Nenhum conteúdo real"));
+assert(!page.includes("CORRECT"));
+assert(content.includes("SYN-001")&&content.includes("SYN-003"));
+assert(!content.match(/CNCI|CFP|invest|finance|CVM/i));
+console.log("MSC00 static safety checks: PASS");
