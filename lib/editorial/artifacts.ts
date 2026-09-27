@@ -59,6 +59,7 @@ export type YouTubeContent = Readonly<{
 }>;
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const hasReference = (ref: string | undefined): boolean => typeof ref === "string" && ref.trim().length > 0;
 
 export function assertValidEditorialArtifact(artifact: EditorialArtifact): void {
   if (!/^MWC-ART-[A-Z0-9-]+$/.test(artifact.artifactId)) throw new Error("INVALID_ARTIFACT_ID");
@@ -66,11 +67,11 @@ export function assertValidEditorialArtifact(artifact: EditorialArtifact): void 
   if (artifact.artifactType === "EXPLORE_ARTICLE" && !artifact.slug) throw new Error("EXPLORE_SLUG_REQUIRED");
   if (artifact.artifactType !== "EXPLORE_ARTICLE" && artifact.slug) throw new Error("DERIVATIVE_SLUG_NOT_ALLOWED");
   if (artifact.publishedAt && !ISO_DATE.test(artifact.publishedAt)) throw new Error("INVALID_ARTIFACT_PUBLISHED_AT");
-  if (artifact.origin === "OWNER_WITH_AI_EDITORIAL_ASSISTANCE" && !artifact.provenanceRefs.some(x=>x.stage==="OWNER_DRAFT")) throw new Error("OWNER_DRAFT_PROVENANCE_REQUIRED");
-  if (artifact.editorialStatus === "TECHNICALLY_AUDITED" && !artifact.technicalReviewReference) throw new Error("TECHNICAL_REVIEW_REFERENCE_REQUIRED");
+  if (artifact.origin === "OWNER_WITH_AI_EDITORIAL_ASSISTANCE" && !artifact.provenanceRefs.some(x=>x.stage==="OWNER_DRAFT" && hasReference(x.ref))) throw new Error("OWNER_DRAFT_PROVENANCE_REQUIRED");
+  if (artifact.editorialStatus === "TECHNICALLY_AUDITED" && !hasReference(artifact.technicalReviewReference)) throw new Error("TECHNICAL_REVIEW_REFERENCE_REQUIRED");
   if (artifact.editorialStatus === "PUBLICATION_APPROVED") {
-    if (!artifact.technicalReviewReference) throw new Error("TECHNICAL_REVIEW_REFERENCE_REQUIRED");
-    if (!artifact.provenanceRefs.some(x=>x.stage==="PUBLICATION_APPROVAL")) throw new Error("PUBLICATION_APPROVAL_REFERENCE_REQUIRED");
+    if (!hasReference(artifact.technicalReviewReference)) throw new Error("TECHNICAL_REVIEW_REFERENCE_REQUIRED");
+    if (!artifact.provenanceRefs.some(x=>x.stage==="PUBLICATION_APPROVAL" && hasReference(x.ref))) throw new Error("PUBLICATION_APPROVAL_REFERENCE_REQUIRED");
   }
 }
 
@@ -80,7 +81,7 @@ export function deriveArtifactPublishability(artifact: EditorialArtifact, knowle
   const knowledgeDecision = derivePublishability(knowledge);
   const reasons = [...knowledgeDecision.reasons];
   if (artifact.editorialStatus !== "PUBLICATION_APPROVED") reasons.push("ARTIFACT_NOT_PUBLICATION_APPROVED");
-  if (!artifact.technicalReviewReference) reasons.push("ARTIFACT_TECHNICAL_REVIEW_MISSING");
+  if (!hasReference(artifact.technicalReviewReference)) reasons.push("ARTIFACT_TECHNICAL_REVIEW_MISSING");
   return Object.freeze({ publishable: reasons.length === 0, reasons: Object.freeze(reasons) });
 }
 
