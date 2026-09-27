@@ -17,6 +17,10 @@ jobs:
       - run: npm run typecheck
       - name: Run editorial structural test
         run: node tests/editorial-v1.cjs
+      - name: Run editorial governance gate
+        run: node tests/editorial-governance-v1.cjs
+      - name: Run editorial publishing gate
+        run: node tests/editorial-publishing-v1.cjs
       - name: Run Home production architecture test
         run: node tests/home-production.cjs
       - name: Run Vehicle Project UX and safety test
@@ -47,7 +51,7 @@ jobs:
         run: node tests/api.cjs
       - name: Report legacy regression debt
         if: steps.legacy_regression.outcome == 'failure'
-        run: echo 'Legacy suite contains pre-existing environment/runtime-sensitive failures. Editorial structural test, typecheck and production build are hard gates.'
+        run: echo 'Legacy suite contains pre-existing environment/runtime-sensitive failures. Editorial structural, governance and publishing tests, typecheck and production build are hard gates.'
       - name: Report BCB integration dependency
         if: steps.bcb_integration.outcome == 'failure'
         run: echo 'BCB collector integration is network/environment dependent; deterministic reference-contract tests remain gated.'
