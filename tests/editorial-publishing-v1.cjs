@@ -21,28 +21,35 @@ assert.equal(TOPIC_001_PUBLISHABILITY.publishable,false,"TEST-09 TOPIC-001 block
 assert.equal(TOPIC_001.draftExists,false,"TEST-09 no TOPIC-001 draft");
 assert.equal(TOPIC_001.governance.evidenceRefs.length,0,"TEST-09 no real evidence");
 
-const changed=[
+const inspectedPublishingArtifacts=[
  "lib/editorial/artifacts.ts","lib/editorial/synthetic-fixtures.ts",
- "components/editorial/ExploreArticlePresentation.tsx","docs/MWC-EXP-003-EDITORIAL-FOUNDATION.md",
- "tests/editorial-publishing-v1.cjs"
+ "components/editorial/ExploreArticlePresentation.tsx","docs/MWC-EXP-003-EDITORIAL-FOUNDATION.md"
 ];
-const source=changed.filter(fs.existsSync).map(f=>fs.readFileSync(f,"utf8")).join("\n").toLowerCase();
-for(const forbidden of ["adsbygoogle","googlesyndication","google_ad_client","ca-pub-"]){
- assert.equal(source.includes(forbidden),false,"TEST-10/11 advertising implementation forbidden: "+forbidden);
-}
-for(const forbidden of ["gtag(","googletagmanager","google-analytics.com","analytics.js"]){
- assert.equal(source.includes(forbidden),false,"TEST-13 analytics implementation forbidden: "+forbidden);
-}
-for(const forbidden of ["__tcfapi(","consentmanager.net","cookiebot.com","onetrust"]){
- assert.equal(source.includes(forbidden),false,"TEST-14 CMP implementation forbidden: "+forbidden);
-}
+const publishingSource=inspectedPublishingArtifacts.filter(fs.existsSync).map(f=>fs.readFileSync(f,"utf8")).join("\n").toLowerCase();
+const assertForbiddenAbsent=(source,terms,label)=>{
+ for(const forbidden of terms) assert.equal(source.includes(forbidden),false,label+": "+forbidden);
+};
+const advertisingTerms=["adsby"+"google","google"+"syndication","google_ad_"+"client","ca-"+"pub-"];
+const analyticsTerms=["gtag"+"(","google"+"tagmanager","google-"+"analytics.com","analytics"+".js"];
+const cmpTerms=["__tcf"+"api(","consent"+"manager.net","cookie"+"bot.com","one"+"trust"];
+assertForbiddenAbsent(publishingSource,advertisingTerms,"TEST-10/11 advertising implementation forbidden");
+assertForbiddenAbsent(publishingSource,analyticsTerms,"TEST-13 analytics implementation forbidden");
+assertForbiddenAbsent(publishingSource,cmpTerms,"TEST-14 CMP implementation forbidden");
+assert.throws(()=>assertForbiddenAbsent("synthetic "+advertisingTerms[0]+" violation",advertisingTerms,"NEGATIVE-CONTROL"),/NEGATIVE-CONTROL/,"detector must reject a deliberately violating artifact");
+
 const presentation=fs.readFileSync("components/editorial/ExploreArticlePresentation.tsx","utf8");
 assert.ok(presentation.includes("content.opening")&&presentation.includes("content.takeaway"),"TEST-12 article content renders independently of advertising");
 
 for(const file of ["lib/project/engine.ts","lib/project/scenario-lab.ts","lib/project/choice.ts","lib/engine/paths-v1.ts"]) assert.ok(fs.existsSync(file),"TEST-15 preserved engine missing: "+file);
 
-const fakeApproved={...F.SYNTHETIC_EXPLORE_ARTICLE,editorialStatus:"PUBLICATION_APPROVED",technicalReviewReference:"synthetic:review",provenanceRefs:[...F.SYNTHETIC_EXPLORE_ARTICLE.provenanceRefs,{stage:"PUBLICATION_APPROVAL",ref:"synthetic:approval"}]};
+const approval=(ref="synthetic:approval")=>({...F.SYNTHETIC_EXPLORE_ARTICLE,editorialStatus:"PUBLICATION_APPROVED",technicalReviewReference:"synthetic:review",provenanceRefs:[...F.SYNTHETIC_EXPLORE_ARTICLE.provenanceRefs,{stage:"PUBLICATION_APPROVAL",ref}]});
+const fakeApproved=approval();
 assertValidEditorialArtifact(fakeApproved);
 assert.equal(deriveArtifactPublishability(fakeApproved,F.SYNTHETIC_KNOWLEDGE).publishable,false,"knowledge gate remains authoritative even after editorial approval");
+assert.throws(()=>assertValidEditorialArtifact(approval("")),/PUBLICATION_APPROVAL_REFERENCE_REQUIRED/,"empty approval reference must fail closed");
+assert.throws(()=>assertValidEditorialArtifact(approval("   ")),/PUBLICATION_APPROVAL_REFERENCE_REQUIRED/,"whitespace-only approval reference must fail closed");
+const missingApproval={...F.SYNTHETIC_EXPLORE_ARTICLE,editorialStatus:"PUBLICATION_APPROVED",technicalReviewReference:"synthetic:review"};
+assert.throws(()=>assertValidEditorialArtifact(missingApproval),/PUBLICATION_APPROVAL_REFERENCE_REQUIRED/,"missing approval reference must fail closed");
+assert.throws(()=>assertValidEditorialArtifact({...fakeApproved,technicalReviewReference:"   "}),/TECHNICAL_REVIEW_REFERENCE_REQUIRED/,"blank technical review reference must fail closed");
 
 console.log("editorial-publishing-v1: PASS");
