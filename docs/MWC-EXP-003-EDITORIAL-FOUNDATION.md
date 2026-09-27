@@ -41,3 +41,7 @@ EXP-003 adds no analytics, CMP, cookies, advertising storage or definitive legal
 ## Synthetic-only implementation
 
 Synthetic fixtures validate the model. They are not routed into public navigation, are not published, and contain no real TOPIC-001 content or learning evidence.
+
+## Dependency provenance
+
+EXP-003 is based on frozen EXP-002 HEAD `2c09da0dbb35941de3d9989fd6bc8e5533e2d6e9`; PR #28 remains a separate unmerged dependency.
