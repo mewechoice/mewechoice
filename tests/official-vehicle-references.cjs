@@ -1,0 +1,11 @@
+const fs=require("node:fs"),assert=require("node:assert/strict"),ts=require("typescript");require.extensions[".ts"]=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,"utf8"),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,f);
+const {buildOfficialVehicleReferences}=require("../lib/reference-data/official-vehicle.ts");
+const {readValidatedVehiclePathReference}=require("../lib/reference-data/schema.ts");
+const at="2026-09-21T02:20:00-03:00";
+const refs=buildOfficialVehicleReferences({financingMonthlyRatePercent:1.99,financingReferencePeriod:"2026-08",retrievedAt:at});
+const f=readValidatedVehiclePathReference(refs.financing),c=readValidatedVehiclePathReference(refs.consortium);
+assert.equal(f.kind,"VEHICLE_FINANCING_AVERAGE_RATE");assert.equal(f.unit,"PERCENT_PER_MONTH");assert.equal(f.lineage.source,"BCB");assert.equal(f.lineage.referenceId,"SGS-25471");assert.equal(f.lineage.referencePeriod,"2026-08");assert.equal(f.value,1.99);
+assert.equal(c.kind,"CONSORTIUM_ADMIN_FEE_AVERAGE");assert.equal(c.value,15.01);assert.equal(c.unit,"PERCENT_OF_CREDIT");assert.equal(c.vehicleCategory,"AUTOMOBILE");assert.equal(c.lineage.referencePeriod,"2024");
+assert.throws(()=>buildOfficialVehicleReferences({financingMonthlyRatePercent:-1,financingReferencePeriod:"2026-08",retrievedAt:at}));
+assert.throws(()=>buildOfficialVehicleReferences({financingMonthlyRatePercent:1.99,financingReferencePeriod:"2026-08",retrievedAt:"2026-09-21"}));
+console.log("official-vehicle-references: PASS");
