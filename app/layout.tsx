@@ -7,7 +7,7 @@ const cormorant = Cormorant_Garamond({ subsets: ["latin"], variable: "--font-cor
 
 export const metadata: Metadata = {
   title: "ME → WE → CHOICE | Primeiro o projeto. Depois, a solução.",
-  description: "Organizamos objetivos, possibilidades e caminhos para decisões de aquisição, patrimônio e projetos pessoais.",
+  description: "A MWeC torna a educação financeira e os investimentos mais simples, claros e didáticos. Aprenda, compreenda e escolha com autonomia.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
