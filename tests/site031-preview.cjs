@@ -1,0 +1,27 @@
+// SITE-031 isolated preview guard: does not mutate production pages or the editorial registry.
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const read = path => fs.readFileSync(path,'utf8');
+const base = 'app/experiencia-031/';
+const home = read(base+'page.tsx');
+const explorer = read(base+'explore/page.tsx');
+const article = read(base+'explore/[slug]/page.tsx');
+const editor = read(base+'site031-editorial.ts');
+const css = read(base+'site031.css');
+const layout = read(base+'layout.tsx');
+assert(home.includes('Primeiro o projeto.'));
+assert(home.includes('Depois, a solução.'));
+assert(home.includes('A MWeC é um espaço para aprender sobre educação financeira e investimentos de forma simples, clara e didática.'));
+assert(home.includes('Explorar conteúdos'));
+assert(home.includes('Conhecer a MWeC'));
+assert(!/Falar com um consultor|Contratar|Aprovação de financiamento|Assessor(?:ia|amento)/.test(home));
+assert(!home.includes('s31-ad-placeholder'), 'Publicidades não podem aparecer na Home');
+assert(explorer.includes('s31-ad-placeholder'), 'Explore deve reservar espaço identificado');
+assert(!/adsbygoogle|googlesyndication|adsense/i.test(explorer), 'Nenhum AdSense ativo');
+assert(editor.includes('derivePublishability'));
+assert(editor.includes('lifecycleStatus === "PUBLISHED"'));
+assert(article.includes('notFound()'));
+assert(layout.includes('index: false'));
+assert(css.includes('@media(max-width:680px)'));
+assert(css.includes('prefers-reduced-motion'));
+console.log('SITE-031 PREVIEW STATIC CHECK: PASS');
