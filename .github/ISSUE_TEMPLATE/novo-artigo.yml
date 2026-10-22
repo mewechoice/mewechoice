@@ -1,0 +1,56 @@
+name: "Novo artigo para o Explore"
+description: "Enviar um rascunho educacional da MWeC para revisão editorial. Este formulário NÃO publica automaticamente."
+title: "[ARTIGO] "
+labels: ["artigo-rascunho"]
+body:
+  - type: markdown
+    attributes:
+      value: "### MWeC | ME → WE → CHOICE\nPreencha o conteúdo e envie. O artigo fica como proposta, não publicado. Você pode compartilhar o link da proposta com o assistente para preparar a revisão e futura publicação."
+  - type: input
+    id: headline
+    attributes:
+      label: "Título do artigo"
+      placeholder: "Ex.: O que é reserva de emergência?"
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: "Categoria"
+      options:
+        - Educação financeira
+        - Organização do dinheiro
+        - Planejamento
+        - Fundamentos dos investimentos
+        - Decisões financeiras
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: "Resumo para o cartão do Explore"
+      description: "Até três frases objetivas."
+    validations:
+      required: true
+  - type: textarea
+    id: body
+    attributes:
+      label: "Texto do artigo"
+      description: "Cole o texto completo. Use subtítulos quando precisar."
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: "Fontes e referências"
+      description: "Informe de onde vieram números, afirmações e exemplos. Se não houver fonte, explique."
+  - type: checkboxes
+    id: review
+    attributes:
+      label: "Conferências antes de enviar"
+      options:
+        - label: "Entendo que isto é um rascunho e ainda passará por revisão."
+          required: true
+        - label: "O texto não promete ganhos, recomenda produtos específicos nem substitui orientação individual."
+          required: true

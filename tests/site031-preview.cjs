@@ -1,0 +1,18 @@
+const assert=require("node:assert/strict");const fs=require("node:fs");const read=p=>fs.readFileSync(p,"utf8");const b="app/experiencia-031/";
+const home=read(b+"home-content.tsx"),explorer=read(b+"explore/explore-content.tsx"),article=read(b+"explore/[slug]/article-content.tsx"),editor=read(b+"site031-editorial.ts"),css=read(b+"site031.css"),layout=read(b+"layout.tsx");
+for(const p of [home,explorer,article])assert(p.includes("preview"));
+assert(home.includes("Primeiro o projeto."));
+assert(home.includes("Depois, a solução."));
+assert(home.includes("Explorar conteúdos"));
+assert(home.includes("Conhecer a MWeC"));
+assert(!/Falar com um consultor|Contratar|Aprovação de financiamento/.test(home));
+assert(!home.includes("s31-ad-placeholder"));
+assert(explorer.includes("s31-ad-placeholder"));
+assert(!/adsbygoogle|googlesyndication|adsense/i.test(explorer));
+assert(editor.includes("derivePublishability"));
+assert(editor.includes('lifecycleStatus === "PUBLISHED"'));
+assert(article.includes("notFound()"));
+assert(layout.includes("index: false"));
+assert(css.includes("@media(max-width:680px)"));
+assert(css.includes("prefers-reduced-motion"));
+console.log("SITE-031 PREVIEW STATIC CHECK: PASS");

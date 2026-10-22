@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EDITORIAL_ARTICLES, EDITORIAL_HYPOTHESES } from "../../lib/editorial/registry";
+import { derivePublishability } from "../../lib/editorial/governance";
 
 export default function DescobrirPage() {
   return (
@@ -31,7 +32,7 @@ export default function DescobrirPage() {
           <div><p className="eyebrow">ARTIGOS EM DESTAQUE</p><h2>Temas reais para decisões mais conscientes.</h2></div>
         </div>
         <div className="editorial-card-grid">
-          {EDITORIAL_ARTICLES.map((a,index)=><Link className={"editorial-story editorial-story--"+(index+1)} href={"/descobrir/"+a.slug} key={a.id}>
+          {EDITORIAL_ARTICLES.filter(a => a.governance.lifecycleStatus === "PUBLISHED" && a.governance.legacyReviewStatus !== "LEGACY_EDITORIAL_REVIEW_REQUIRED" && derivePublishability(a.governance).publishable).map((a,index)=><Link className={"editorial-story editorial-story--"+(index+1)} href={"/descobrir/"+a.slug} key={a.id}>
             <div className="editorial-story-image" aria-hidden="true" />
             <div className="editorial-story-body">
               <div className="editorial-story-meta"><span>{a.topicId.replace("editorial:","")}</span><small>{a.readingTimeEstimate} de leitura</small></div>
