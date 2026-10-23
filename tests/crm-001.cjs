@@ -37,7 +37,7 @@ assert(server.includes("httpOnly:true") && server.includes('sameSite:"strict"'))
 assert(!/service_role|sb_secret_/i.test(server));
 assert(requests.includes("context(req)") && requests.includes("sameOrigin(req)"));
 assert(requests.includes('limit=100') && requests.includes('Prefer:"return=representation"'));
-assert(session.includes('roleFor(') && session.includes("sameOrigin(req)"));
+assert(session.includes("grantsFor") && session.includes("sameOrigin(req)"));
 assert(oauth.includes("code_challenge") && oauth.includes("code_challenge_method"));
-assert(callback.includes("roleFor(") && callback.includes("timingSafeEqual"));
+assert(callback.includes("grantsFor") && callback.includes("timingSafeEqual"));
 console.log("CRM-001 privacy gate + admin inbox static checks: PASS");
