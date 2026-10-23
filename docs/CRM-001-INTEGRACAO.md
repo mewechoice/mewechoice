@@ -36,3 +36,9 @@ A API responde **503** se não estiver configurada. Não configurar chave \`serv
 6. Aprovação explícita do Owner para publicar o módulo no site de produção.
 
 **STATUS:** implementação isolada, não publicada em produção.
+
+## Verificação adicional 2026-10-23
+- GitHub Actions PR Validation: sucesso (typecheck, governança, testes e build).
+- Supabase RLS: SELECT pelo papel anon negado, como previsto.
+- Variáveis somente para Preview da branch; a implantação deve ser reconstruída após sua configuração.
+- Os dados do CRM permanecem restritos; nenhuma conta administrativa foi provisionada.
