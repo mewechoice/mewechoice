@@ -22,8 +22,10 @@ export default function PrivacyPage() {
       <p>Você pode solicitar informações, correção ou exclusão de dados, conforme a legislação aplicável, utilizando o próprio <Link href="/contato" style={{ color: "#0075b4", textDecoration: "underline" }}>formulário de contato</Link> e selecionando “Outro assunto”.</p>
       <h2>O que não enviar</h2>
       <p>Não compartilhe CPF, RG, CNH, documentos, dados bancários, senhas ou informações financeiras sensíveis neste contato inicial.</p>
+      <h2>Armazenamento e proteção</h2>
+      <p>As solicitações são armazenadas em infraestrutura Supabase e processadas pelo site hospedado na Vercel. O acesso ao CRM é restrito a pessoas autorizadas. O uso desses serviços não autoriza a transferência das informações a outras operações da MWeC.</p>
       <h2>Política de retenção</h2>
-      <p>O prazo formal de retenção e os dados completos do responsável pelo tratamento ainda precisam de validação institucional antes da liberação definitiva do formulário ao público.</p>
+      <p>O prazo de retenção e a identificação completa do responsável pelo tratamento ainda estão em definição. A coleta pública permanecerá desabilitada até essa revisão ser concluída.</p>
       <p><Link className="s31-inline-link" href="/contato">Voltar ao contato →</Link></p>
     </main>
     <PreviewFooter preview={false} />

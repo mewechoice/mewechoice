@@ -42,3 +42,15 @@ A API responde **503** se não estiver configurada. Não configurar chave \`serv
 - Supabase RLS: SELECT pelo papel anon negado, como previsto.
 - Variáveis somente para Preview da branch; a implantação deve ser reconstruída após sua configuração.
 - Os dados do CRM permanecem restritos; nenhuma conta administrativa foi provisionada.
+
+
+## CRM-001B | Dashboard de atendimento e controle de ativação
+- Dashboard criado em `/admin/contatos`. Em ambiente de testes, autenticação por e-mail/senha e integração OAuth Google condicionada à configuração `MWEC_CRM_APP_ORIGIN` e do provedor Google no Supabase.
+- Todas as consultas e transições de estado são validadas no servidor por token Supabase e permissão `mwec_crm_access`; usuário não autorizado não vê dados.
+- Cookies `httpOnly`, `SameSite=Strict` e `Secure` em produção. Fluxo OAuth PKCE utiliza cookies temporários com SameSite=Lax.
+- Filtro e marcação de andamento: Novo, Em atendimento, Respondido e Encerrado. Sem envio automático de respostas.
+- Sem usuários cadastrados em `auth.users` nem em `mwec_crm_access` na inspeção inicial: não é possível autenticar na prévia até o Owner habilitar sua conta de maneira verificada.
+- **Novo gate de privacidade**: `MWEC_CRM_ACCEPT_LEADS` deve ser `true` para captar. Ausente ou `false`, o endpoint responde 503 e **não coleta** dados.
+- Pendente a revisão de: responsável pelo tratamento, prazo de retenção, canal oficial de direitos, testes ponta a ponta por navegador, proteções anti-bot/abuso e identidade verificada do primeiro responsável.
+- Não criar contas por SQL sem identidade confirmada. Não habilitar Google sem parâmetros oficiais OAuth.
+- Preview apenas. Não realizar merge na `main` ou deploy em produção até todos os gates concluídos.

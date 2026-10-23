@@ -60,6 +60,10 @@ export async function POST(request: NextRequest) {
   if (!interests.includes(interest as Interest)) return reply("Escolha o motivo do contato.", 400);
   if (!accepted) return reply("Leia as informações de privacidade para continuar.", 400);
 
+  // Privacy gate: no public collection until formal authorization and testing.
+  if (process.env.MWEC_CRM_ACCEPT_LEADS !== "true")
+    return reply("Este formulário ainda está em preparação. Entre em contato mais tarde.", 503);
+
   const endpoint = process.env.MWEC_SUPABASE_URL;
   const key = process.env.MWEC_SUPABASE_PUBLISHABLE_KEY;
   if (!endpoint || !key) return reply("O formulário ainda não está disponível. Tente novamente depois.", 503);
