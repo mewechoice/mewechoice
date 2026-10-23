@@ -16,6 +16,7 @@ export function PreviewHeader({ preview = true }: { preview?: boolean }) {
           <Link href={`${homeHref}#sobre`}>Conhecer a MWeC</Link>
           <Link href={`${homeHref}#filosofia`}>Filosofia</Link>
           <Link href={`${base}/explore`}>Explore</Link>
+          <Link href="/contato">Contato</Link>
         </nav>
         <Link href={`${base}/explore`} className="s31-header-cta">Explorar conteúdos <span aria-hidden="true">↗</span></Link>
       </div>
@@ -28,7 +29,7 @@ export function PreviewFooter({ preview = true }: { preview?: boolean }) {
   const homeHref = base || "/";
   return <footer className="s31-footer"><div className="s31-wrap s31-footer-grid">
     <div><strong>MWeC</strong><p>ME → WE → CHOICE</p><small>Primeiro o projeto. Depois, a solução.</small></div>
-    <div><Link href={homeHref}>Início</Link><Link href={`${base}/explore`}>Explore</Link><Link href={`${homeHref}#sobre`}>Conhecer a MWeC</Link></div>
+    <div><Link href={homeHref}>Início</Link><Link href={`${base}/explore`}>Explore</Link><Link href={`${homeHref}#sobre`}>Conhecer a MWeC</Link><Link href="/contato">Contato</Link><Link href="/privacidade">Privacidade</Link></div>
     <p className="s31-footer-note">Conteúdo educacional. Não constitui aconselhamento personalizado, oferta de produtos nem indicação de investimentos.</p>
   </div></footer>;
 }
