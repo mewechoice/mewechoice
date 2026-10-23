@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server";
-import {clearAuth,configured,context,fail,finished,googleOrigin,ok,roleFor,sameOrigin,supabase,withAuth} from "../../../../../lib/mwec-crm/server";
+import {clearAuth,configured,context,fail,finished,googleOrigin,ok,grantsFor,sameOrigin,supabase,withAuth} from "../../../../../lib/mwec-crm/server";
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 export async function GET(req:NextRequest){
   if(!configured())return ok({configured:false,authenticated:false,googleAvailable:false});
   const ctx=await context(req);
-  return finished(ok({configured:true,authenticated:!!ctx,role:ctx?.role??null,email:ctx?.email??null,googleAvailable:!!googleOrigin()}),ctx);
+  return finished(ok({configured:true,authenticated:!!ctx,role:ctx?.role??null,editorRole:ctx?.editorRole??null,email:ctx?.email??null,googleAvailable:!!googleOrigin()}),ctx);
 }
 export async function POST(req:NextRequest){
   if(!configured())return fail("Painel ainda não configurado.",503);
@@ -20,8 +20,10 @@ export async function POST(req:NextRequest){
       method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password})
     }) as {access_token:string;refresh_token:string;expires_in:number;user?:{id?:string;email?:string}};
     const user=session.user?.id?session.user:await supabase("/auth/v1/user",session.access_token) as {id?:string;email?:string};
-    if(!user.id||!await roleFor(session.access_token,user.id))return fail("Acesso não autorizado.",403);
-    return withAuth(ok({authenticated:true,role:await roleFor(session.access_token,user.id),email:user.email}),session);
+    if(!user.id)return fail("Acesso não autorizado.",403);
+    const {role,editorRole}=await grantsFor(session.access_token,user.id);
+    if(!role&&!editorRole)return fail("Acesso não autorizado.",403);
+    return withAuth(ok({authenticated:true,role,editorRole,email:user.email}),session);
   }catch{return fail("Credenciais inválidas ou acesso não autorizado.",401)}
 }
 export async function DELETE(req:NextRequest){

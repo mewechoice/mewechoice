@@ -5,7 +5,7 @@ export const dynamic="force-dynamic";
 const states=["new","in_progress","replied","closed"];
 export async function GET(req:NextRequest){
   if(!configured())return fail("Painel ainda não configurado.",503);
-  const ctx=await context(req);if(!ctx)return fail("Acesso não autorizado.",401);
+  const ctx=await context(req);if(!ctx?.role)return fail("Acesso não autorizado.",403);
   const status=req.nextUrl.searchParams.get("status");
   const part=status&&states.includes(status)?"&status=eq."+status:"";
   try{
@@ -16,7 +16,7 @@ export async function GET(req:NextRequest){
 export async function PATCH(req:NextRequest){
   if(!configured())return fail("Painel ainda não configurado.",503);
   if(!sameOrigin(req))return fail("Origem não autorizada.",403);
-  const ctx=await context(req);if(!ctx)return fail("Acesso não autorizado.",401);
+  const ctx=await context(req);if(!ctx?.role)return fail("Acesso não autorizado.",403);
   if(Number(req.headers.get("content-length")||0)>1200)return fail("Dados inválidos.",400);
   try{
     const data=await req.json() as Record<string,unknown>;

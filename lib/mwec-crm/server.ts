@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-type Role = "owner" | "attendant";
+export type Role = "owner" | "attendant";
+export type EditorialRole = "owner" | "editor";
 type AuthSession = {access_token:string;refresh_token:string;expires_in:number;user?:{id?:string;email?:string}};
-export type Context = {token:string;id:string;email:string;role:Role;renewed?:AuthSession};
+export type Context = {token:string;id:string;email:string;role:Role|null;editorRole:EditorialRole|null;renewed?:AuthSession};
 const ACCESS = "mwec_crm_access";
 const REFRESH = "mwec_crm_refresh";
 const ORIGIN_COOKIE = "mwec_crm_pkce";
@@ -41,6 +42,14 @@ export async function roleFor(token:string,id:string):Promise<Role|null> {
   const rows=await supabase("/rest/v1/mwec_crm_access?select=role&user_id=eq."+encodeURIComponent(id)+"&limit=1",token) as {role:string}[];
   return rows?.[0]?.role==="owner"?"owner":rows?.[0]?.role==="attendant"?"attendant":null;
 }
+export async function editorRoleFor(token:string,id:string):Promise<EditorialRole|null> {
+  const rows=await supabase("/rest/v1/mwec_editor_roles?select=role&user_id=eq."+encodeURIComponent(id)+"&limit=1",token) as {role:string}[];
+  return rows?.[0]?.role==="owner"?"owner":rows?.[0]?.role==="editor"?"editor":null;
+}
+export async function grantsFor(token:string,id:string){
+  const [role,editorRole]=await Promise.all([roleFor(token,id),editorRoleFor(token,id)]);
+  return {role,editorRole};
+}
 export function withAuth(res:NextResponse,session:AuthSession) {
   const cookie=options();
   res.cookies.set(ACCESS,session.access_token,{...cookie,maxAge:Math.max(120,Math.min(session.expires_in||3600,7200))});
@@ -68,8 +77,8 @@ export async function context(req:NextRequest):Promise<Context|null>{
   }
   if(!token||!user?.id)return null;
   try{
-    const role=await roleFor(token,user.id);
-    return role?{token,id:user.id,email:user.email??"",role,renewed}:null;
+    const {role,editorRole}=await grantsFor(token,user.id);
+    return role||editorRole?{token,id:user.id,email:user.email??"",role,editorRole,renewed}:null;
   }catch{return null}
 }
 export function finished(res:NextResponse,ctx:Context|null){return ctx?.renewed?withAuth(res,ctx.renewed):res}
