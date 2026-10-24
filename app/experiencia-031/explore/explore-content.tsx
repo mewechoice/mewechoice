@@ -1,9 +1,10 @@
 import Link from "next/link";
+import type {PublicArticle} from "../../../lib/mwec-editorial/public";
 import { PreviewFooter, PreviewHeader, PublicationNotice } from "../components";
 import { getPublishedSite031Articles, site031Topic, SITE031_TOPICS } from "../site031-editorial";
 
 type SearchInput = { q?: string; categoria?: string };
-export default async function Site031Explore({searchParams,preview=false}:{searchParams: Promise<SearchInput>; preview?:boolean}) {
+export default async function Site031Explore({searchParams,preview=false,cmsArticles=[]}:{searchParams: Promise<SearchInput>; preview?:boolean;cmsArticles?:PublicArticle[]}) {
   const base = preview ? "/experiencia-031/explore" : "/explore";
   const params = await searchParams;
   const q = typeof params.q === "string" ? params.q.trim().slice(0, 100) : "";
@@ -11,6 +12,10 @@ export default async function Site031Explore({searchParams,preview=false}:{searc
   const articles = getPublishedSite031Articles().filter((a) =>
     (!categoria || site031Topic(a) === categoria) &&
     (!q || `${a.headline} ${a.deck} ${a.sections.map(s => s.heading).join(" ")}`.toLocaleLowerCase("pt-BR").includes(q.toLocaleLowerCase("pt-BR")))
+  );
+  const cms = preview ? [] : cmsArticles.filter(a =>
+    (!categoria || a.category===categoria) &&
+    (!q || (a.title+" "+a.excerpt).toLocaleLowerCase("pt-BR").includes(q.toLocaleLowerCase("pt-BR")))
   );
   return <>
     <PreviewHeader preview={preview} />
@@ -25,7 +30,7 @@ export default async function Site031Explore({searchParams,preview=false}:{searc
         </form>
         <div className="s31-categories" aria-label="Temas candidatos">{SITE031_TOPICS.map(t=><span key={t}>{t}</span>)}</div>
         <PublicationNotice />
-        {articles.length ? <div className="s31-feature-grid">{articles.map(a=><Link className="s31-article-card" key={a.id} href={`${base}/${a.slug}`}><small>{site031Topic(a)} · {a.readingTimeEstimate}</small><h3>{a.headline}</h3><p>{a.deck}</p><span aria-hidden="true">→</span></Link>)}</div> : <div className="s31-empty"><h3>{q || categoria ? "Nenhum artigo aprovado encontrado para esse filtro." : "Estamos preparando as próximas leituras."}</h3><p>O catálogo mostra apenas materiais que passaram pela aprovação editorial. As categorias acima são uma proposta de navegação, não uma lista de artigos publicados.</p>{q || categoria ? <Link className="s31-inline-link" href={base}>Limpar filtros →</Link> : null}</div>}
+        {articles.length || cms.length ? <div className="s31-feature-grid">{cms.map(a=><Link className="s31-article-card" key={a.id} href={`/explore/${a.slug}`}><small>{a.category} · Leitura</small><h3>{a.title}</h3><p>{a.excerpt}</p><span aria-hidden="true">→</span></Link>)}{articles.map(a=><Link className="s31-article-card" key={a.id} href={`${base}/${a.slug}`}><small>{site031Topic(a)} · {a.readingTimeEstimate}</small><h3>{a.headline}</h3><p>{a.deck}</p><span aria-hidden="true">→</span></Link>)}</div> : <div className="s31-empty"><h3>{q || categoria ? "Nenhum artigo aprovado encontrado para esse filtro." : "Estamos preparando as próximas leituras."}</h3><p>O catálogo mostra apenas materiais que passaram pela aprovação editorial. As categorias acima são uma proposta de navegação, não uma lista de artigos publicados.</p>{q || categoria ? <Link className="s31-inline-link" href={base}>Limpar filtros →</Link> : null}</div>}
         <aside className="s31-ad-placeholder" aria-label="Espaço reservado para publicidade"><strong>Espaço reservado para publicidade</strong><p>Área de demonstração. Nenhuma rede de anúncios está instalada ou ativa.</p></aside>
       </div></section>
     </main>

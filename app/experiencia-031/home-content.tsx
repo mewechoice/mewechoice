@@ -1,10 +1,15 @@
 import Link from "next/link";
+import {publishedArticles} from "../../lib/mwec-editorial/public";
 import { PreviewFooter, PreviewHeader } from "./components";
 import { getPublishedSite031Articles } from "./site031-editorial";
 
-export default function Site031Home({ preview = false }: { preview?: boolean }) {
+export default async function Site031Home({ preview = false }: { preview?: boolean }) {
   const base = preview ? "/experiencia-031" : "";
-  const articles = getPublishedSite031Articles().slice(0, 3);
+  const live = preview ? [] : await publishedArticles();
+  const articles = [
+    ...live.map(a=>({id:a.id,headline:a.title,deck:a.excerpt,slug:a.slug,readingTimeEstimate:"Leitura",href:"/explore/"+a.slug})),
+    ...getPublishedSite031Articles().map(a=>({...a,href:(preview?"/experiencia-031":"")+"/explore/"+a.slug}))
+  ].slice(0,3);
   return <>
     <PreviewHeader preview={preview} />
     <main id="conteudo">
@@ -46,8 +51,18 @@ export default function Site031Home({ preview = false }: { preview?: boolean }) 
 
       <section className="s31-section s31-featured"><div className="s31-wrap">
         <div className="s31-heading-row"><div><p className="s31-eyebrow">EXPLORE</p><h2>Conteúdos para descobrir.</h2></div><Link href={`${base}/explore`} className="s31-inline-link">Ver biblioteca <span aria-hidden="true">→</span></Link></div>
-        {articles.length ? <div className="s31-feature-grid">{articles.map((a) => <Link href={`${base}/explore/${a.slug}`} className="s31-article-card" key={a.id}><small>LEITURA · {a.readingTimeEstimate}</small><h3>{a.headline}</h3><p>{a.deck}</p><span aria-hidden="true">→</span></Link>)}</div> : <div className="s31-coming-soon"><p className="s31-eyebrow">BIBLIOTECA EM PREPARAÇÃO</p><h3>As próximas leituras estão em revisão.</h3><p>Estamos organizando os conteúdos com critérios editoriais antes de disponibilizá-los como artigos definitivos.</p><Link className="s31-inline-link" href={`${base}/explore`}>Explorar categorias <span aria-hidden="true">→</span></Link></div>}
+        {articles.length ? <div className="s31-feature-grid">{articles.map((a) => <Link href={a.href} className="s31-article-card" key={a.id}><small>LEITURA · {a.readingTimeEstimate}</small><h3>{a.headline}</h3><p>{a.deck}</p><span aria-hidden="true">→</span></Link>)}</div> : <div className="s31-coming-soon"><p className="s31-eyebrow">BIBLIOTECA EM PREPARAÇÃO</p><h3>As próximas leituras estão em revisão.</h3><p>Estamos organizando os conteúdos com critérios editoriais antes de disponibilizá-los como artigos definitivos.</p><Link className="s31-inline-link" href={`${base}/explore`}>Explorar categorias <span aria-hidden="true">→</span></Link></div>}
       </div></section>
+      <section className="s31-section s31-contact-invite" aria-labelledby="s31-contact-title">
+        <div className="s31-wrap s31-contact-invite-inner">
+          <div>
+            <p className="s31-eyebrow">FALE COM A MWeC</p>
+            <h2 id="s31-contact-title">Uma boa conversa começa com uma pergunta.</h2>
+            <p>Tem alguma dúvida, sugestão ou gostaria de saber mais sobre a MWeC? Envie uma mensagem. Primeiro, queremos compreender o que você procura.</p>
+          </div>
+          <Link className="s31-inline-link" href="/contato">Entrar em contato <span aria-hidden="true">→</span></Link>
+        </div>
+      </section>
       <section className="s31-cta-bottom"><div className="s31-wrap"><p>O próximo passo pode ser uma boa pergunta.</p><h2>Explore no seu tempo.</h2><Link className="s31-button" href={`${base}/explore`}>Explorar conteúdos <span aria-hidden="true">→</span></Link></div></section>
     </main>
     <PreviewFooter preview={preview} />

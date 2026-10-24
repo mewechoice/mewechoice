@@ -21,6 +21,10 @@ jobs:
         run: node tests/editorial-governance-v1.cjs
       - name: Run editorial publishing gate
         run: node tests/editorial-publishing-v1.cjs
+      - name: Run unified administration and publication gate
+        run: node tests/admin-unificado.cjs
+      - name: Run CRM-001 capture safety checks
+        run: node tests/crm-001.cjs
       - name: Run Home production architecture test
         run: node tests/home-production.cjs
       - name: Run Vehicle Project UX and safety test
