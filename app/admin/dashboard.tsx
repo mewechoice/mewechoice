@@ -51,7 +51,11 @@ export default function AdminHub(){
     !session?.configured?<main className="mwc-unified-gate"><section className="mwc-unified-card"><small>MWeC / ÁREA RESTRITA</small><h1>Painel em preparação</h1><p>A autenticação da administração ainda não foi ativada neste ambiente.</p></section></main>:
     !session.authenticated?<main className="mwc-unified-gate"><form className="mwc-unified-card" onSubmit={signIn}>
       <small>ME → WE → CHOICE / PAINEL ADMINISTRATIVO</small><h1>Bem-vindo à MWeC.</h1><p>Uma única entrada para o editor de artigos e o acompanhamento de contatos. O acesso depende da autorização de sua conta.</p>
-      {session.googleAvailable?<><a className="mwc-unified-google" href="/api/mwec/crm/oauth/google">Continuar com Google</a><div className="mwc-unified-separator">ou entrar com e-mail e senha</div></>:null}
+      {session.googleAvailable?
+        <a className="mwc-unified-google" href="/api/mwec/crm/oauth/google">Continuar com Google</a>:
+        <><button className="mwc-unified-google" type="button" disabled aria-describedby="mwc-google-pending">Continuar com Google</button>
+        <p id="mwc-google-pending" className="mwc-unified-footnote">A entrada Google ainda está em configuração. Falta ativar o provedor Google e autorizar a primeira conta administrativa.</p></>}
+      <div className="mwc-unified-separator">ou entrar com e-mail e senha</div>
       <label>E-mail<input autoComplete="username" type="email" required value={email} onChange={e=>setEmail(e.target.value)}/></label>
       <label>Senha<input autoComplete="current-password" type="password" required value={password} onChange={e=>setPassword(e.target.value)}/></label>
       <button className="mwc-unified-primary" disabled={busy} type="submit">{busy?"Verificando...":"Entrar no painel"}</button>

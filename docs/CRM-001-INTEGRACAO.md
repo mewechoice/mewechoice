@@ -54,3 +54,21 @@ A API responde **503** se não estiver configurada. Não configurar chave \`serv
 - Pendente a revisão de: responsável pelo tratamento, prazo de retenção, canal oficial de direitos, testes ponta a ponta por navegador, proteções anti-bot/abuso e identidade verificada do primeiro responsável.
 - Não criar contas por SQL sem identidade confirmada. Não habilitar Google sem parâmetros oficiais OAuth.
 - Preview apenas. Não realizar merge na `main` ou deploy em produção até todos os gates concluídos.
+
+
+## CRM-001D | Google: exibição e ativação
+
+Causa diagnosticada em 23/10/2026: falta a variável MWEC_CRM_APP_ORIGIN na branch Preview, e não há contas autorizadas nem credenciais Google configuradas. O botão anterior ficava oculto por googleAvailable=false.
+
+Correção de UX: o botão passa a ser exibido na entrada central, desabilitado e com motivo explícito quando a autenticação ainda não estiver operacional. Assim, não se declara acesso funcional antes da configuração.
+
+Procedimento de ativação:
+1. Criar credenciais OAuth para aplicação Web no Google Cloud; guardar Client ID e Client Secret exclusivamente no painel de autenticação, nunca em chat ou GitHub.
+2. Registrar o URI de callback do provedor no Google Cloud: https://hffuxkrjymomhpfnosbp.supabase.co/auth/v1/callback
+3. No Supabase mwec-editorial, em Authentication > Providers > Google, habilitar o provedor com as credenciais.
+4. Em Supabase Authentication > URL Configuration, permitir o callback da aplicação: https://mewechoice-git-crm-001-captura-site-me-we-choice.vercel.app/api/mwec/crm/oauth/callback
+5. Na Vercel Preview somente para crm-001-captura-site, configurar MWEC_CRM_APP_ORIGIN=https://mewechoice-git-crm-001-captura-site-me-we-choice.vercel.app, após configurar o provedor.
+6. Verificar a identidade da conta Google administrativa e só então associar seu UID nas permissões mwec_editor_roles e mwec_crm_access.
+7. Reimplantar Preview e testar OAuth, sessão, negação a usuários não autorizados e separação de permissões.
+
+Não adicionar essa variável antecipadamente como falso sinal de prontidão. Não publicar em produção antes das verificações.

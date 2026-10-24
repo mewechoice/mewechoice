@@ -40,4 +40,10 @@ assert(requests.includes('limit=100') && requests.includes('Prefer:"return=repre
 assert(session.includes("grantsFor") && session.includes("sameOrigin(req)"));
 assert(oauth.includes("code_challenge") && oauth.includes("code_challenge_method"));
 assert(callback.includes("grantsFor") && callback.includes("timingSafeEqual"));
-console.log("CRM-001 privacy gate + admin inbox static checks: PASS");
+const unified = read("app/admin/dashboard.tsx");
+assert(unified.includes("Continuar com Google"), "Google option rendered");
+assert(unified.includes('disabled aria-describedby="mwc-google-pending"'), "Google disabled until setup");
+assert(unified.includes("session.googleAvailable"), "Google link gated");
+assert(inbox.includes('disabled aria-describedby="mwc-google-not-ready"'), "CRM fallback");
+assert(unified.includes('href="/admin/artigos"') && unified.includes('href="/admin/contatos"'), "Unified hub");
+console.log("CRM-001 privacy gate + admin inbox + Google visibility static checks: PASS");
